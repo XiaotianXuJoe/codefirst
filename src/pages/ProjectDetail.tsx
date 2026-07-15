@@ -14,7 +14,11 @@ import {
   FileText,
   Github,
   Star,
+  Folder,
 } from 'lucide-react'
+import FileTree from '../components/FileTree'
+import CodeBlockWithHeader from '../components/CodeBlockWithHeader'
+import StepFileTree from '../components/StepFileTree'
 
 /* ───────────────────────── types ───────────────────────── */
 
@@ -23,6 +27,20 @@ interface Step {
   time: string
   code: string
   explanation: string
+  filename: string
+  filepath?: string
+  lineRange?: string
+  action: 'new-file' | 'new-function' | 'modify' | 'replace'
+  description?: string
+}
+
+interface FileNode {
+  name: string
+  type: 'folder' | 'file-core' | 'file-config' | 'file-doc' | 'file-data'
+  description?: string
+  analogy?: string
+  required: boolean
+  children?: FileNode[]
 }
 
 interface KeyConcept {
@@ -69,6 +87,7 @@ interface ProjectDetailData {
   faq: FAQItem[]
   githubProjects: GitHubProject[]
   extensions: Extension[]
+  fileStructure: FileNode[]
 }
 
 /* ─────────────────────── project data ─────────────────────── */
@@ -101,6 +120,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `import random\nimport string\n\n# 定义四种字符集\nlowercase = string.ascii_lowercase\nuppercase = string.ascii_uppercase\ndigits = string.digits\nsymbols = string.punctuation`,
         explanation:
           '导入random和string两个内置模块。string模块提供了预设的字符集合，避免手写a-z、A-Z等。',
+        filename: 'main.py',
+        filepath: 'password-generator/',
+        lineRange: '第1-10行',
+        action: 'new-file' as const,
+        description: '导入random和string模块，定义四种子符集',
       },
       {
         title: '实现密码生成函数',
@@ -108,6 +132,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `def generate_password(length=12, use_upper=True, use_digits=True, use_symbols=True):\n    chars = lowercase\n    if use_upper:   chars += uppercase\n    if use_digits:  chars += digits\n    if use_symbols: chars += symbols\n    \n    password = ''.join(random.choice(chars) for _ in range(length))\n    return password`,
         explanation:
           '根据用户的选择拼接字符集，然后用random.choice从字符集中随机选取指定数量的字符，最后拼接成字符串。',
+        filename: 'main.py',
+        filepath: 'password-generator/',
+        lineRange: '第12-20行',
+        action: 'new-function' as const,
+        description: '根据用户选择拼接字符集，随机选取字符生成密码',
       },
       {
         title: '实现强度检测函数',
@@ -115,6 +144,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `def check_strength(password):\n    score = 0\n    if len(password) >= 8:  score += 1\n    if len(password) >= 12: score += 1\n    if any(c.isupper() for c in password): score += 1\n    if any(c.isdigit() for c in password): score += 1\n    if any(c in symbols for c in password): score += 1\n    \n    if score <= 2: return "弱"\n    if score <= 3: return "中"\n    return "强"`,
         explanation:
           '从长度、大写字母、数字、符号四个维度评分，根据总分返回弱/中/强的评级。',
+        filename: 'main.py',
+        filepath: 'password-generator/',
+        lineRange: '第22-32行',
+        action: 'new-function' as const,
+        description: '从长度、大写字母、数字、符号四个维度评分',
       },
       {
         title: '主菜单循环',
@@ -122,6 +156,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `def main():\n    while True:\n        print("\\n=== 密码生成器 ===")\n        print("1. 生成密码")\n        print("2. 检测密码强度")\n        print("3. 退出")\n        choice = input("请选择: ")\n        \n        if choice == "1":\n            length = int(input("密码长度: ") or "12")\n            pwd = generate_password(length)\n            print(f"生成密码: {pwd}")\n            print(f"强度: {check_strength(pwd)}")\n        elif choice == "2":\n            pwd = input("输入密码: ")\n            print(f"强度: {check_strength(pwd)}")\n        else:\n            break\n\nif __name__ == "__main__":\n    main()`,
         explanation:
           '用while True创建循环菜单，根据用户选择调用不同功能。input()获取用户输入，if-elif处理不同选项。',
+        filename: 'main.py',
+        filepath: 'password-generator/',
+        lineRange: '第34-55行',
+        action: 'modify' as const,
+        description: '整合所有功能，添加输入验证和循环菜单',
       },
     ],
     keyConcepts: [
@@ -145,6 +184,12 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { level: 2, text: '给程序加颜色输出（colorama库）', skill: '第三方库使用' },
       { level: 3, text: '用Tkinter做成图形界面', skill: 'GUI编程入门' },
       { level: 4, text: '支持易记密码模式（随机单词组合）', skill: '读取文件+单词列表' },
+    ],
+    fileStructure: [
+      { name: 'password-generator', type: 'folder', description: '项目根文件夹', required: true, children: [
+        { name: 'main.py', type: 'file-core', description: '程序入口，包含菜单循环和用户交互', analogy: '就像餐厅的前台，客人一来先到这里', required: true },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档，介绍项目功能和使用方法', analogy: '就像餐厅的菜单，告诉别人你有什么', required: false }
+      ]}
     ],
   },
   'weather-cli': {
@@ -174,6 +219,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: '# 在终端运行\npip install requests',
         explanation:
           'requests是Python最流行的HTTP库，让API调用变得简单。',
+        filename: 'main.py',
+        filepath: 'weather-cli/',
+        lineRange: '第1-2行',
+        action: 'new-file' as const,
+        description: '创建主程序文件，开始编写代码',
       },
       {
         title: '发送第一个API请求',
@@ -181,6 +231,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `import requests\n\ndef get_weather(city):\n    url = f"https://wttr.in/{city}?format=%C|%t|%h"\n    try:\n        response = requests.get(url, timeout=5)\n        response.raise_for_status()\n        return response.text\n    except requests.RequestException as e:\n        return f"请求失败: {e}"`,
         explanation:
           '使用requests.get()发送HTTP GET请求。timeout参数防止请求卡住。raise_for_status()检查HTTP错误码。',
+        filename: 'weather.py',
+        filepath: 'weather-cli/',
+        lineRange: '第1-10行',
+        action: 'new-file' as const,
+        description: '实现天气查询核心逻辑，调用API获取数据',
       },
       {
         title: '解析和格式化数据',
@@ -188,13 +243,23 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `def parse_weather(raw_text):\n    parts = raw_text.strip().split("|")\n    if len(parts) >= 3:\n        return {\n            "condition": parts[0],\n            "temperature": parts[1],\n            "humidity": parts[2]\n        }\n    return None\n\ndef display_weather(data, city):\n    if data is None:\n        print("无法解析天气数据")\n        return\n    print(f"\\n🌍 {city} 的当前天气:")\n    print(f"  天气状况: {data['condition']}")\n    print(f"  温度: {data['temperature']}")\n    print(f"  湿度: {data['humidity']}")`,
         explanation:
           '将API返回的管道分隔文本解析为字典，然后用格式化输出展示。',
+        filename: 'formatter.py',
+        filepath: 'weather-cli/',
+        lineRange: '第1-16行',
+        action: 'new-file' as const,
+        description: '数据格式化，将API原始数据转成可读格式',
       },
       {
         title: '主程序整合',
         time: '20分钟',
-        code: `def main():\n    print("=== 命令行天气查询 ===")\n    while True:\n        city = input("\\n请输入城市名 (或输入'退出'): ").strip()\n        if city in ["退出", "quit", "q"]:\n            break\n        if not city:\n            print("城市名不能为空")\n            continue\n        \n        raw = get_weather(city)\n        if raw.startswith("请求失败"):\n            print(raw)\n        else:\n            data = parse_weather(raw)\n            display_weather(data, city)\n\nif __name__ == "__main__":\n    main()`,
+        code: `from weather import get_weather\nfrom formatter import parse_weather, display_weather\n\ndef main():\n    print("=== 命令行天气查询 ===")\n    while True:\n        city = input("\\n请输入城市名 (或输入'退出'): ").strip()\n        if city in ["退出", "quit", "q"]:\n            break\n        if not city:\n            print("城市名不能为空")\n            continue\n        \n        raw = get_weather(city)\n        if raw.startswith("请求失败"):\n            print(raw)\n        else:\n            data = parse_weather(raw)\n            display_weather(data, city)\n\nif __name__ == "__main__":\n    main()`,
         explanation:
           '整合所有功能，添加输入验证和循环菜单。用.strip()去除首尾空格，防止空输入。',
+        filename: 'main.py',
+        filepath: 'weather-cli/',
+        lineRange: '第1-22行',
+        action: 'modify' as const,
+        description: '整合所有功能，添加输入验证和循环菜单',
       },
     ],
     keyConcepts: [
@@ -218,6 +283,15 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { level: 2, text: '保存查询历史到本地文件', skill: '文件读写+数据持久化' },
       { level: 3, text: '改用OpenWeatherMap API（需注册获取API Key）', skill: 'API认证机制' },
       { level: 4, text: '添加自动定位（根据IP获取当前城市）', skill: '更多API的链式调用' },
+    ],
+    fileStructure: [
+      { name: 'weather-cli', type: 'folder', required: true, children: [
+        { name: 'main.py', type: 'file-core', description: '程序入口，包含菜单循环', analogy: '餐厅前台', required: true },
+        { name: 'weather.py', type: 'file-core', description: '天气查询核心逻辑，调用API获取数据', analogy: '后厨，实际做菜的地方', required: true },
+        { name: 'formatter.py', type: 'file-core', description: '数据格式化，将API原始数据转成可读格式', analogy: '摆盘师，让菜看起来更好看', required: true },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false },
+        { name: 'requirements.txt', type: 'file-config', description: '依赖清单，记录需要安装的第三方库', analogy: '采购清单', required: true }
+      ]}
     ],
   },
   'file-renamer': {
@@ -247,6 +321,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `import os\nfrom pathlib import Path\n\ndef list_files(folder_path):\n    path = Path(folder_path)\n    if not path.exists():\n        print("文件夹不存在!")\n        return []\n    \n    files = [f for f in path.iterdir() if f.is_file()]\n    return files`,
         explanation:
           '使用pathlib.Path处理文件路径，iterdir()遍历目录，is_file()过滤只保留文件（排除子文件夹）。',
+        filename: 'main.py',
+        filepath: 'file-renamer/',
+        lineRange: '第1-10行',
+        action: 'new-file' as const,
+        description: '导入模块，实现列出文件夹文件功能',
       },
       {
         title: '实现重命名函数',
@@ -254,6 +333,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `def add_prefix(files, prefix):\n    for f in files:\n        new_name = prefix + f.name\n        new_path = f.parent / new_name\n        f.rename(new_path)\n        print(f"{f.name} -> {new_name}")\n\ndef rename_with_index(files, prefix="file"):\n    for index, f in enumerate(files, start=1):\n        ext = f.suffix\n        new_name = f"{prefix}_{index:03d}{ext}"\n        new_path = f.parent / new_name\n        f.rename(new_path)\n        print(f"{f.name} -> {new_name}")`,
         explanation:
           'f.parent获取父目录，f.suffix获取扩展名。{index:03d}格式化为001, 002等三位数字。',
+        filename: 'renamer.py',
+        filepath: 'file-renamer/',
+        lineRange: '第1-14行',
+        action: 'new-file' as const,
+        description: '重命名核心逻辑：添加前缀和按序号重命名',
       },
       {
         title: '实现替换功能和预览模式',
@@ -261,6 +345,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `def replace_in_name(files, old, new):\n    for f in files:\n        if old in f.name:\n            new_name = f.name.replace(old, new)\n            new_path = f.parent / new_name\n            f.rename(new_path)\n            print(f"{f.name} -> {new_name}")\n\ndef preview_changes(files, operation, **kwargs):\n    print("\\n=== 预览模式 ===")\n    print("以下文件将被重命名:")\n    for f in files:\n        if operation == "prefix":\n            new_name = kwargs["prefix"] + f.name\n        print(f"  {f.name}  ->  {new_name}")\n    \n    confirm = input("\\n确认执行? (y/n): ").lower()\n    return confirm == 'y'`,
         explanation:
           '预览模式先展示将要进行的修改，让用户确认后再执行。这是防止误操作的重要设计。',
+        filename: 'renamer.py',
+        filepath: 'file-renamer/',
+        lineRange: '第16-30行',
+        action: 'modify' as const,
+        description: '添加字符串替换和预览确认功能',
       },
       {
         title: '主菜单',
@@ -268,6 +357,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `def main():\n    print("=== 文件批量重命名工具 ===")\n    folder = input("请输入文件夹路径: ")\n    files = list_files(folder)\n    \n    if not files:\n        print("没有找到文件")\n        return\n    \n    print(f"\\n找到 {len(files)} 个文件")\n    print("\\n1. 添加前缀\\n2. 按序号重命名\\n3. 替换文件名中的文字")\n    \n    choice = input("请选择操作: ")\n    if choice == "1":\n        prefix = input("输入前缀: ")\n        if preview_changes(files, "prefix", prefix=prefix):\n            add_prefix(list_files(folder), prefix)\n    # ... 其他选项`,
         explanation:
           '整合所有功能，添加文件存在检查和预览确认流程。注意重新获取文件列表因为路径对象在重命名后会失效。',
+        filename: 'main.py',
+        filepath: 'file-renamer/',
+        lineRange: '第12-32行',
+        action: 'modify' as const,
+        description: '整合所有功能，添加文件存在检查和预览确认流程',
       },
     ],
     keyConcepts: [
@@ -279,7 +373,7 @@ const projectDetails: Record<string, ProjectDetailData> = {
     faq: [
       { q: 'FileNotFoundError', a: '文件夹路径错误。用Path()处理路径，支持/跨平台。' },
       { q: '重命名后文件名冲突', a: '两个文件重命名后可能同名。先检查目标文件名是否已存在。' },
-      { q: '隐藏文件被修改', a: '没有过滤隐藏文件。加条件 not f.name.startswith(\'.\')。' },
+      { q: '隐藏文件被修改', a: "没有过滤隐藏文件。加条件 not f.name.startswith('.')。" },
     ],
     githubProjects: [
       { name: 'tomi3-11/Python-beginner-CLI-projects', stars: '~50', description: '包含文件操作类项目，可以学习不同的文件处理模式' },
@@ -290,6 +384,14 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { level: 2, text: '支持撤销操作（记录原始文件名）', skill: '日志/状态管理' },
       { level: 3, text: '按文件修改日期重命名', skill: 'os.path.getmtime()' },
       { level: 4, text: '用Tkinter做图形界面（拖拽文件夹）', skill: 'GUI+文件操作结合' },
+    ],
+    fileStructure: [
+      { name: 'file-renamer', type: 'folder', required: true, children: [
+        { name: 'main.py', type: 'file-core', description: '程序入口，菜单和预览确认', analogy: '前台接待', required: true },
+        { name: 'renamer.py', type: 'file-core', description: '重命名核心逻辑', analogy: '加工厂', required: true },
+        { name: 'test_folder', type: 'folder', description: '测试用文件夹（可自己创建）', required: false },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
     ],
   },
   'github-profile': {
@@ -319,13 +421,23 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `<div class="search-box">\n  <input type="text" id="username" placeholder="输入GitHub用户名...">\n  <button onclick="searchUser()">查询</button>\n</div>\n<div id="profile" class="profile-card" style="display:none;">\n  <img id="avatar" src="" alt="头像">\n  <h2 id="name"></h2>\n  <p id="bio"></p>\n  <div class="stats">\n    <span>仓库: <b id="repos"></b></span>\n    <span>粉丝: <b id="followers"></b></span>\n  </div>\n  <a id="link" href="#" target="_blank">查看GitHub主页</a>\n</div>`,
         explanation:
           '构建基本的HTML骨架。input获取用户输入，button触发搜索，profile-card展示结果。',
+        filename: 'index.html',
+        filepath: 'github-profile/',
+        lineRange: '第10-25行',
+        action: 'new-file' as const,
+        description: '网页结构，包含搜索框和资料卡片',
       },
       {
         title: 'CSS样式',
         time: '45分钟',
-        code: `/* 核心样式 */\n.profile-card {\n  background: white;\n  border-radius: 12px;\n  padding: 24px;\n  box-shadow: 0 4px 20px rgba(0,0,0,0.1);\n}\n.profile-card img {\n  width: 100px;\n  height: 100px;\n  border-radius: 50%;\n}\n.stats {\n  display: flex;\n  gap: 24px;\n}`,
+        code: `/* 核心样式 */\n.profile-card {\n  background: white;\n  border-radius: 12px;\n  padding: 24px;\n  box-shadow: 0 4px 20px rgba(0,0,0,0.1);\n}\n.profile-card img {\n  width: 100px;\n  height: 100px;\n  border-radius: 50%;\n}\n.stats {\n  display: flex;\n  gap: 24px;}`,
         explanation:
           '用flexbox布局，border-radius做圆角，box-shadow添加阴影。白色卡片在灰色背景上突出。',
+        filename: 'style.css',
+        filepath: 'github-profile/',
+        lineRange: '第1-15行',
+        action: 'new-file' as const,
+        description: '网页样式，让页面美观',
       },
       {
         title: 'JavaScript API调用',
@@ -333,6 +445,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `const API_URL = 'https://api.github.com/users/';\n\nasync function searchUser() {\n    const username = document.getElementById('username').value.trim();\n    if (!username) { showError('请输入用户名'); return; }\n    \n    try {\n        const response = await fetch(API_URL + username);\n        if (response.status === 404) throw new Error('用户不存在');\n        if (!response.ok) throw new Error('请求失败');\n        \n        const data = await response.json();\n        displayProfile(data);\n    } catch (err) {\n        showError(err.message);\n    }\n}\n\nfunction displayProfile(data) {\n    document.getElementById('avatar').src = data.avatar_url;\n    document.getElementById('name').textContent = data.name || data.login;\n    document.getElementById('bio').textContent = data.bio || '暂无简介';\n    document.getElementById('repos').textContent = data.public_repos;\n    document.getElementById('followers').textContent = data.followers;\n    document.getElementById('link').href = data.html_url;\n    document.getElementById('profile').style.display = 'block';\n}`,
         explanation:
           "使用Fetch API发送异步请求，async/await让异步代码更易读。getElementById获取DOM元素，直接修改属性和内容。",
+        filename: 'script.js',
+        filepath: 'github-profile/',
+        lineRange: '第1-28行',
+        action: 'new-file' as const,
+        description: '网页交互逻辑，调用API获取并展示用户资料',
       },
     ],
     keyConcepts: [
@@ -357,6 +474,14 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { level: 2, text: '暗色模式切换', skill: 'CSS变量+主题切换' },
       { level: 3, text: '展示用户的贡献热力图', skill: '图片嵌入+数据处理' },
       { level: 4, text: '支持对比两个用户的数据', skill: '复杂UI布局' },
+    ],
+    fileStructure: [
+      { name: 'github-profile', type: 'folder', required: true, children: [
+        { name: 'index.html', type: 'file-core', description: '网页结构，包含搜索框和资料卡片', analogy: '房子的框架结构', required: true },
+        { name: 'style.css', type: 'file-core', description: '网页样式，让页面美观', analogy: '房子的装修', required: true },
+        { name: 'script.js', type: 'file-core', description: '网页交互逻辑，调用API', analogy: '房子的电路系统', required: true },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
     ],
   },
   'todo-app': {
@@ -386,13 +511,23 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `<div class="container">\n  <h1>✅ 待办事项</h1>\n  <div class="input-area">\n    <input type="text" id="taskInput" placeholder="添加新任务...">\n    <button onclick="addTask()">+</button>\n  </div>\n  <div class="filters">\n    <button class="filter-btn active" onclick="setFilter('all')">全部</button>\n    <button class="filter-btn" onclick="setFilter('active')">进行中</button>\n    <button class="filter-btn" onclick="setFilter('completed')">已完成</button>\n  </div>\n  <ul id="taskList"></ul>\n  <div class="stats" id="stats"></div>\n</div>`,
         explanation:
           '构建完整HTML骨架：输入区域、筛选按钮、任务列表、统计区域。',
+        filename: 'index.html',
+        filepath: 'todo-app/',
+        lineRange: '第10-25行',
+        action: 'new-file' as const,
+        description: '网页结构：输入框、筛选按钮、任务列表',
       },
       {
         title: 'CSS样式（核心）',
         time: '45分钟',
-        code: `/* 核心样式 */\n#taskList li {\n  display: flex;\n  align-items: center;\n  padding: 12px;\n  border-bottom: 1px solid #f0f0f0;\n  gap: 10px;\n}\n#taskList li span.completed {\n  text-decoration: line-through;\n  color: #999;\n}\n.filter-btn.active {\n  background: #667eea;\n  color: white;\n}\n.delete-btn {\n  background: none;\n  border: none;\n  color: #ff6b6b;\n  cursor: pointer;\n}`,
+        code: `/* 核心样式 */\n#taskList li {\n  display: flex;\n  align-items: center;\n  padding: 12px;\n  border-bottom: 1px solid #f0f0f0;\n  gap: 10px;\n}\n#taskList li span.completed {\n  text-decoration: line-through;\n  color: #999;\n}\n.filter-btn.active {\n  background: #667eea;\n  color: white;\n}\n.delete-btn {\n  background: none;\n  border: none;\n  color: #ff6b6b;\n  cursor: pointer;}`,
         explanation:
           '用flexbox排列任务项，.completed类添加删除线效果，.active类高亮当前筛选按钮。',
+        filename: 'style.css',
+        filepath: 'todo-app/',
+        lineRange: '第1-18行',
+        action: 'new-file' as const,
+        description: '网页样式：卡片、按钮、完成任务划线效果',
       },
       {
         title: 'JavaScript核心逻辑',
@@ -400,6 +535,11 @@ const projectDetails: Record<string, ProjectDetailData> = {
         code: `let tasks = [];\nlet currentFilter = 'all';\n\nfunction loadTasks() {\n  const saved = localStorage.getItem('todo_tasks');\n  if (saved) tasks = JSON.parse(saved);\n  render();\n}\nfunction saveTasks() {\n  localStorage.setItem('todo_tasks', JSON.stringify(tasks));\n}\n\nfunction addTask() {\n  const input = document.getElementById('taskInput');\n  const text = input.value.trim();\n  if (!text) return;\n  tasks.push({ id: Date.now(), text, completed: false });\n  input.value = '';\n  saveTasks(); render();\n}\n\nfunction toggleTask(id) {\n  const task = tasks.find(t => t.id === id);\n  if (task) { task.completed = !task.completed; saveTasks(); render(); }\n}\n\nfunction deleteTask(id) {\n  tasks = tasks.filter(t => t.id !== id); saveTasks(); render(); }\n\nfunction render() {\n  const list = document.getElementById('taskList');\n  list.innerHTML = '';\n  let filtered = tasks;\n  if (currentFilter === 'active') filtered = tasks.filter(t => !t.completed);\n  if (currentFilter === 'completed') filtered = tasks.filter(t => t.completed);\n  \n  filtered.forEach(task => {\n    const li = document.createElement('li');\n    li.innerHTML = \`<input type="checkbox" \${task.completed ? 'checked' : ''} onchange="toggleTask(\${task.id})">\n      <span class="\${task.completed ? 'completed' : ''}">\${task.text}</span>\n      <button class="delete-btn" onclick="deleteTask(\${task.id})">🗑️</button>\`;\n    list.appendChild(li);\n  });\n  document.getElementById('stats').textContent = \`共 \${tasks.length} 个任务，已完成 \${tasks.filter(t => t.completed).length} 个\`;\n}`,
         explanation:
           '这是核心CRUD逻辑：loadTasks从localStorage读取，saveTasks保存，add/toggle/delete修改数据后调用render刷新UI。render根据currentFilter过滤并重新渲染列表。',
+        filename: 'script.js',
+        filepath: 'todo-app/',
+        lineRange: '第1-45行',
+        action: 'new-file' as const,
+        description: '核心逻辑：CRUD操作、LocalStorage存取、筛选渲染',
       },
     ],
     keyConcepts: [
@@ -424,6 +564,14 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { level: 2, text: '添加任务优先级（高/中/低）+ 按优先级排序', skill: '数据结构+排序' },
       { level: 3, text: '添加任务截止日期，显示是否逾期', skill: 'Date对象处理' },
       { level: 4, text: '用React/Vue重写整个项目', skill: '前端框架入门' },
+    ],
+    fileStructure: [
+      { name: 'todo-app', type: 'folder', required: true, children: [
+        { name: 'index.html', type: 'file-core', description: '网页结构：输入框、筛选按钮、任务列表', analogy: '房屋框架', required: true },
+        { name: 'style.css', type: 'file-core', description: '网页样式：卡片、按钮、完成任务划线效果', analogy: '室内装修', required: true },
+        { name: 'script.js', type: 'file-core', description: '核心逻辑：CRUD操作、LocalStorage存取', analogy: '智能家居系统', required: true },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
     ],
   },
 }
@@ -532,6 +680,21 @@ export default function ProjectDetail() {
     setCopied(false)
   }, [slug])
 
+  /* ── file progress helper ── */
+
+  function buildFileProgress(steps: Step[], allFiles: string[]) {
+    const progress: { filename: string; statusByStep: ('pending' | 'active' | 'completed')[] }[] =
+      allFiles.map(f => ({ filename: f, statusByStep: steps.map((_, i) => {
+        const stepFiles = steps.slice(0, i + 1).map(s => s.filename)
+        const firstIdx = stepFiles.indexOf(f)
+        const lastIdx = stepFiles.lastIndexOf(f)
+        if (firstIdx === -1) return 'pending'
+        if (lastIdx <= i - 1) return 'completed'
+        return 'active'
+      }) }))
+    return progress
+  }
+
   /* ── not found ── */
   if (!project) {
     return (
@@ -562,6 +725,9 @@ export default function ProjectDetail() {
 
   const prevSlug = getPrevSlug(slug!)
   const nextSlug = getNextSlug(slug!)
+
+  const allFiles = Array.from(new Set(project.steps.map(s => s.filename)))
+  const fileProgress = buildFileProgress(project.steps, allFiles)
 
   return (
     <div className="bg-[#F4EFE6]">
@@ -756,6 +922,28 @@ export default function ProjectDetail() {
         </div>
       </section>
 
+      {/* ── File Structure Section ── */}
+      <section className="py-8">
+        <div className="mx-auto max-w-4xl px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="rounded-2xl border border-[#E5E0D5] bg-white p-6"
+          >
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-[#2A2A2A]">
+              <Folder className="h-5 w-5 text-[#E88B2E]" />
+              项目结构
+            </h2>
+            <p className="mb-4 text-sm text-[#8A8A8A]">
+              做完这个项目后，你的文件夹会长这样。点击文件查看详情。
+            </p>
+            <FileTree structure={project.fileStructure} />
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── Prerequisites Section ── */}
       <section className="py-8">
         <div className="mx-auto max-w-4xl px-6">
@@ -858,26 +1046,26 @@ export default function ProjectDetail() {
                         transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] }}
                         className="overflow-hidden"
                       >
-                        <div className="border-t border-[#E5E0D5] p-5">
+                        <div className="border-t border-[#E5E0D5] p-5 space-y-4">
+                          {/* Step File Tree */}
+                          <StepFileTree
+                            stepNum={i + 1}
+                            totalSteps={project.steps.length}
+                            fileStates={fileProgress}
+                          />
                           {/* Code Block */}
-                          <div className="relative mb-4 rounded-lg bg-[#2A2A2A] p-4 overflow-x-auto">
-                            <pre
-                              className="font-mono text-sm leading-relaxed"
-                              dangerouslySetInnerHTML={{
-                                __html: highlightCode(step.code),
-                              }}
-                            />
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                navigator.clipboard.writeText(step.code)
-                              }}
-                              className="absolute right-3 top-3 rounded-md bg-white/10 p-1.5 text-white/60 transition-colors hover:bg-white/20 hover:text-white"
-                              title="复制代码"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </div>
+                          <CodeBlockWithHeader
+                            filename={step.filename}
+                            filepath={step.filepath}
+                            lineRange={step.lineRange}
+                            action={step.action}
+                            description={step.description}
+                            language={project.slug === 'github-profile' || project.slug === 'todo-app'
+                              ? (step.filename.endsWith('.css') ? 'css' : step.filename.endsWith('.html') ? 'html' : 'javascript')
+                              : 'python'}
+                            code={step.code}
+                            stepNum={i + 1}
+                          />
                           {/* Explanation */}
                           <p className="text-sm text-[#4A4A4A] leading-relaxed">
                             {step.explanation}

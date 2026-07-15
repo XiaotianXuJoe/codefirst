@@ -143,6 +143,54 @@ const allProjects = [
     resumeValue: 'CRUD开发 · LocalStorage · DOM操作',
     image: '/project-todo.jpg',
   },
+  {
+    id: 6,
+    slug: 'movie-scraper',
+    emoji: '🕷️',
+    title: '豆瓣电影数据抓取与分析',
+    level: 3,
+    levelLabel: 'Level 3',
+    levelColor: 'from-[#4A90D9] to-[#2E5A8C]',
+    time: '5-7小时',
+    lines: '~250行',
+    stack: ['Python', 'requests', 'BeautifulSoup', 'pandas'],
+    stackColor: 'bg-[#E3F0FC] text-[#2E5A8C]',
+    description: '抓取豆瓣电影Top250数据，进行清洗、统计分析并生成可视化图表。',
+    resumeValue: '爬虫 + 数据分析 + 数据可视化',
+    image: '/project-movie.jpg',
+  },
+  {
+    id: 7,
+    slug: 'markdown-notes',
+    emoji: '📝',
+    title: 'Markdown笔记Web应用',
+    level: 3,
+    levelLabel: 'Level 3',
+    levelColor: 'from-[#4A90D9] to-[#2E5A8C]',
+    time: '6-8小时',
+    lines: '~300行',
+    stack: ['HTML', 'CSS', 'JavaScript', 'marked.js'],
+    stackColor: 'bg-[#E3F0FC] text-[#2E5A8C]',
+    description: '功能完整的Markdown笔记应用，左右分栏实时预览，标签分类与全文搜索。',
+    resumeValue: '组件化设计 + 状态管理 + Markdown渲染',
+    image: '/project-notes.jpg',
+  },
+  {
+    id: 8,
+    slug: 'site-monitor',
+    emoji: '🌐',
+    title: '网站状态监控工具',
+    level: 3,
+    levelLabel: 'Level 3',
+    levelColor: 'from-[#4A90D9] to-[#2E5A8C]',
+    time: '4-6小时',
+    lines: '~200行',
+    stack: ['Python', 'requests', 'asyncio'],
+    stackColor: 'bg-[#E3F0FC] text-[#2E5A8C]',
+    description: '批量检查网站HTTP状态码和响应时间，生成彩色状态报告。DevOps入门。',
+    resumeValue: '异步编程 + DevOps + 配置驱动',
+    image: '/project-monitor.jpg',
+  },
 ]
 
 // ── Sort Options ────────────────────────────────────────────────────
@@ -156,13 +204,14 @@ const sortOptions: { value: SortOption; label: string }[] = [
 ]
 
 // ── Level Filter Tabs ───────────────────────────────────────────────
-type LevelFilter = 'all' | 0 | 1 | 2
+type LevelFilter = 'all' | 0 | 1 | 2 | 3
 
 const levelFilters: { value: LevelFilter; label: string; color: string }[] = [
   { value: 'all', label: '全部', color: 'from-[#E88B2E] to-[#B55A00]' },
   { value: 0, label: 'Level 0', color: 'from-[#7BA37E] to-[#5C8A5F]' },
   { value: 1, label: 'Level 1', color: 'from-[#E88B2E] to-[#B55A00]' },
   { value: 2, label: 'Level 2', color: 'from-[#C07BA0] to-[#9B5A7D]' },
+  { value: 3, label: 'Level 3', color: 'from-[#4A90D9] to-[#2E5A8C]' },
 ]
 
 // ── Parse time for sorting ──────────────────────────────────────────

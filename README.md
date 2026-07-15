@@ -1,73 +1,99 @@
-# React + TypeScript + Vite
+# CodeFirst - 编程项目第一站
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 帮助零基础转码者找到第一个能独立完成的实战项目
 
-Currently, two official plugins are available:
+## 项目简介
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+CodeFirst 是一个面向零基础转码者的编程项目学习网站。核心理念是"每个项目2小时可完成，能写进简历"。
 
-## React Compiler
+### 为什么做这个项目？
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+许多零基础学习者在学完编程语法后，面对"该做什么项目"这一问题非常迷茫。市面上的教程要么太简单（只是一个代码片段），要么太复杂（需要前后端框架、数据库等）。CodeFirst 填补了这两者之间的空白，提供难度递进、完整可运行的实战项目。
 
-## Expanding the ESLint configuration
+## 8个精选项目（覆盖3个难度等级）
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Level | 项目 | 技术栈 | 时间 |
+|:---|:---|:---|:---:|
+| **Level 0** | 🔐 密码生成器 | Python内置库 | 1-2h |
+| **Level 1** | 🌤️ 天气查询工具 | Python + API | 2-3h |
+| **Level 1** | 📁 文件批量重命名 | Python + 文件操作 | 2-4h |
+| **Level 2** | 🔍 GitHub用户查询站 | HTML/CSS/JS + API | 3-5h |
+| **Level 2** | ✅ 待办事项管理网页 | HTML/CSS/JS + LocalStorage | 4-6h |
+| **Level 3** | 🕷️ 豆瓣电影数据抓取与分析 | Python + requests + pandas + matplotlib | 5-7h |
+| **Level 3** | 📝 Markdown笔记Web应用 | HTML/CSS/JS + marked.js | 6-8h |
+| **Level 3** | 🌐 网站状态监控工具 | Python + asyncio + JSON | 4-6h |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 为什么新增3个Level 3项目？
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+原5个项目覆盖了基础工具和简单前端，但缺少**数据工程**、**复杂前端应用**和**DevOps/自动化**方向的进阶内容：
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **🕷️ 电影数据抓取**：数据工程入门，涵盖爬虫→清洗→分析→可视化完整流水线，是Python最热门的就业方向之一
+- **📝 Markdown笔记应用**：TODO应用的自然进阶，引入组件化设计和状态管理，是前端面试必考项目类型
+- **🌐 网站状态监控**：DevOps方向入门，引入asyncio异步编程，配置文件驱动设计贴近真实工程实践
+
+## 项目骨架可视化系统
+
+**第一性原理**：初学者最大的困惑是"文件该放哪里、项目该长什么样"。很多教程直接给代码，但初学者不知道这个代码该写在哪个文件里。我们要做的是"先看到骨架，再填血肉"——让初学者在做项目之前，就对最终的项目全貌有一个清晰的图景，并在每一步知道"现在我在哪个位置做什么"。
+
+### Phase 1（已完成）
+
+1. **FileTree 交互式文件树** (`src/components/FileTree.tsx`)
+   - VS Code 风格展示项目文件结构
+   - 点击文件显示"身份卡片"：作用、类型、是否必需、生活化类比
+   - 帮助初学者在做项目之前，就对最终的项目全貌有一个清晰的图景
+
+2. **CodeBlockWithHeader 代码块定位条** (`src/components/CodeBlockWithHeader.tsx`)
+   - 文件名 + 行号 + 操作类型标签（新增文件/新增函数/修改代码）+ 作用说明
+   - 配合语法高亮（react-syntax-highlighter）
+   - 让初学者在每一步都知道"现在我在哪个位置做什么"
+
+### Phase 2（已完成）
+
+3. **StepFileTree 渐进式迷你文件树** (`src/components/StepFileTree.tsx`)
+   - 每个步骤只显示相关的文件
+   - 文件状态动态变化：⚪待开始 → 🟡正在编辑 → ✅已完成
+   - 实现"做一步，长一块"的渐进式揭示体验
+
+## 技术栈
+
+- React 19 + TypeScript
+- Tailwind CSS v3.4.19
+- Vite v7.2.4
+- Framer Motion（动画）
+- react-syntax-highlighter（代码高亮）
+- Lucide React（图标）
+
+## 页面结构
+
+| 页面 | 路径 | 内容 |
+|------|------|------|
+| 首页 | `/` | Hero、项目卡片、Level说明、统计、上手指南 |
+| 项目列表 | `/projects` | 搜索、筛选（含Level 3）、排序、项目卡片网格 |
+| 项目详情 | `/projects/:slug` | 文件树、分步教程、FAQ、简历模板、扩展挑战 |
+| 学习路径 | `/learning-path` | 3条职业方向路线 |
+| 关于 | `/about` | 使命宣言、使用指南、贡献方式 |
+
+## 本地开发
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 构建
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
 ```
+
+## 部署
+
+构建产物在 `dist/` 目录，可部署到任何静态托管平台。
+
+## 贡献
+
+欢迎提交适合初学者的项目！请确保项目满足：
+- 2-8小时内可完成
+- 有明确的实用价值
+- 代码量 < 350行
+- 有清晰的扩展方向

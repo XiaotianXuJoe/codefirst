@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Link } from 'react-router'
 import { motion, useInView } from 'framer-motion'
 import {
@@ -339,8 +339,6 @@ function SkillTreeSection() {
 
 // ── Path Card ──────────────────────────────────────────────────────
 function PathCard({ path }: { path: LearningPath }) {
-  const PathIcon = path.icon
-
   return (
     <motion.div
       variants={fadeUpChild}

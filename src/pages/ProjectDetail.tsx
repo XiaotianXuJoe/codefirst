@@ -1158,20 +1158,13 @@ export default function ProjectDetail() {
                 </div>
               </motion.div>
 
-              {/* CTA Row */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.4 }}
-                className="flex flex-wrap gap-3"
-              >
-                <a
-                  href="#steps"
-                  className="inline-flex items-center rounded-full px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-[#E88B2E] to-[#B55A00] transition-all duration-300 hover:shadow-lg hover:opacity-90"
+              {/* GitHub Link */}
+              {project.githubProjects.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.4 }}
                 >
-                  开始跟着做
-                </a>
-                {project.githubProjects.length > 0 && (
                   <a
                     href={`https://github.com/${project.githubProjects[0].name}`}
                     target="_blank"
@@ -1181,8 +1174,8 @@ export default function ProjectDetail() {
                     <Github className="mr-2 h-4 w-4" />
                     查看GitHub示例
                   </a>
-                )}
-              </motion.div>
+                </motion.div>
+              )}
             </div>
 
             {/* Right Column - Image */}

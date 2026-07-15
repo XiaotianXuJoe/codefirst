@@ -574,6 +574,347 @@ const projectDetails: Record<string, ProjectDetailData> = {
       ]}
     ],
   },
+  'movie-scraper': {
+    slug: 'movie-scraper',
+    emoji: '🕷️',
+    title: '豆瓣电影数据抓取与分析',
+    level: 3,
+    levelLabel: 'Level 3',
+    levelColor: 'from-[#4A90D9] to-[#2E5A8C]',
+    time: '5-7小时',
+    lines: '~250行',
+    stack: ['Python', 'requests', 'BeautifulSoup', 'pandas', 'matplotlib'],
+    stackColor: 'bg-[#E3F0FC] text-[#2E5A8C]',
+    prerequisites: ['Python基础语法', '列表/字典操作', '函数定义', 'pip安装包'],
+    description: '抓取豆瓣电影Top250的公开数据，进行数据清洗、统计分析并生成可视化图表。涵盖完整的数据处理流水线。',
+    whyThisProject: '数据工程是Python最热门的就业方向之一。这个项目涵盖了完整的数据处理流水线：抓取→清洗→存储→分析→可视化。让你第一次感受到"用数据讲故事"的力量。',
+    image: '/project-movie.jpg',
+    resumeText: '使用requests+BeautifulSoup实现豆瓣电影Top250数据抓取，pandas完成数据清洗与统计分析，matplotlib生成评分分布、Top10排名、年份趋势等多维可视化图表。输出结构化CSV数据集及分析报告。',
+    resumeTags: ['网络爬虫', '数据分析', '数据可视化', 'pandas', 'matplotlib'],
+    fileStructure: [
+      { name: 'movie-scraper', type: 'folder', description: '项目根文件夹', required: true, children: [
+        { name: 'scraper.py', type: 'file-core', description: '爬取逻辑：HTTP请求+HTML解析', analogy: '情报收集员，负责从网页中提取信息', required: true },
+        { name: 'analyzer.py', type: 'file-core', description: '数据分析：pandas统计与计算', analogy: '数据分析师，从数据中发现规律', required: true },
+        { name: 'visualizer.py', type: 'file-core', description: '图表生成：matplotlib绘制', analogy: '设计师，把数据变成好看的图表', required: true },
+        { name: 'main.py', type: 'file-core', description: '入口：协调爬取→分析→可视化全流程', analogy: '项目经理，统筹安排各环节', required: true },
+        { name: 'utils.py', type: 'file-core', description: '工具函数：数据清洗、保存CSV', analogy: '后勤部门，处理杂务', required: true },
+        { name: 'config.py', type: 'file-config', description: '配置：目标URL、请求头、参数', analogy: '导航手册，告诉系统去哪里', required: true },
+        { name: 'movies.csv', type: 'file-data', description: '生成的数据文件（运行时创建）', required: false },
+        { name: 'top10.png', type: 'file-data', description: '生成的图表文件（运行时创建）', required: false },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
+    ],
+    steps: [
+      {
+        title: '配置模块：定义目标URL和请求参数',
+        time: '15分钟',
+        code: `# config.py - 项目配置\n\nBASE_URL = "https://movie.douban.com/top250"\nHEADERS = {\n    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"\n}\nSTART = 0\nPER_PAGE = 25\nTOTAL_PAGES = 10  # 250部电影，每页25部`,
+        explanation: '将可配置的参数集中管理，方便后续修改。User-Agent模拟浏览器访问，避免被网站拒绝。',
+        filename: 'config.py',
+        filepath: 'movie-scraper/',
+        lineRange: '第1-10行',
+        action: 'new-file' as const,
+        description: '定义爬取目标URL、请求头和分页参数'
+      },
+      {
+        title: '工具模块：数据清洗与CSV保存',
+        time: '20分钟',
+        code: `# utils.py - 工具函数\nimport csv\nimport re\n\ndef clean_text(text: str) -> str:\n    """去除空白字符"""\n    return text.strip().replace('\\n', '').replace('\\xa0', '')\n\ndef extract_year(info: str) -> int:\n    """从电影信息中提取年份"""\n    match = re.search(r'(\\d{4})', info)\n    return int(match.group(1)) if match else 0\n\ndef save_to_csv(movies: list, filename: str = "movies.csv"):\n    """保存电影数据到CSV"""\n    if not movies:\n        print("没有数据可保存")\n        return\n    keys = movies[0].keys()\n    with open(filename, 'w', newline='', encoding='utf-8') as f:\n        writer = csv.DictWriter(f, fieldnames=keys)\n        writer.writeheader()\n        writer.writerows(movies)\n    print(f"已保存 {len(movies)} 条数据到 {filename}")`,
+        explanation: '数据清洗是数据工程的核心步骤。去除空白、提取年份、统一格式，让后续分析更可靠。CSV是最通用的数据交换格式。',
+        filename: 'utils.py',
+        filepath: 'movie-scraper/',
+        lineRange: '第1-25行',
+        action: 'new-file' as const,
+        description: '实现文本清洗、年份提取、CSV保存等工具函数'
+      },
+      {
+        title: '爬取模块：HTTP请求与HTML解析',
+        time: '45分钟',
+        code: `# scraper.py - 爬取逻辑\nimport requests\nfrom bs4 import BeautifulSoup\nfrom config import BASE_URL, HEADERS, START, PER_PAGE, TOTAL_PAGES\nfrom utils import clean_text, extract_year\n\ndef fetch_page(start: int) -> str:\n    """获取单页HTML"""\n    url = f"{BASE_URL}?start={start}"\n    try:\n        response = requests.get(url, headers=HEADERS, timeout=10)\n        response.raise_for_status()\n        return response.text\n    except requests.RequestException as e:\n        print(f"请求失败: {e}")\n        return ""\n\ndef parse_movies(html: str) -> list:\n    """从HTML解析电影数据"""\n    soup = BeautifulSoup(html, 'html.parser')\n    items = soup.find_all('div', class_='item')\n    movies = []\n    \n    for item in items:\n        title = clean_text(item.find('span', class_='title').text)\n        rating = item.find('span', class_='rating_num').text\n        rating_num = item.find('div', class_='star').find_all('span')[-1].text\n        link = item.find('div', class_='hd').find('a')['href']\n        info = item.find('p', class_='').text if item.find('p', class_='') else ""\n        \n        movies.append({\n            'title': title,\n            'rating': float(rating),\n            'rating_num': rating_num,\n            'year': extract_year(info),\n            'link': link\n        })\n    \n    return movies\n\ndef scrape_all() -> list:\n    """爬取所有页面"""\n    all_movies = []\n    for page in range(TOTAL_PAGES):\n        start = START + page * PER_PAGE\n        print(f"正在爬取第 {page + 1}/{TOTAL_PAGES} 页...")\n        html = fetch_page(start)\n        if html:\n            movies = parse_movies(html)\n            all_movies.extend(movies)\n    print(f"\\n共爬取 {len(all_movies)} 部电影")\n    return all_movies`,
+        explanation: 'requests发送HTTP请求，BeautifulSoup解析HTML。find/find_all定位元素，从class名识别数据位置。分页爬取时打印进度让用户知道程序在运行。',
+        filename: 'scraper.py',
+        filepath: 'movie-scraper/',
+        lineRange: '第1-55行',
+        action: 'new-file' as const,
+        description: '使用requests+BeautifulSoup爬取豆瓣电影数据并解析HTML'
+      },
+      {
+        title: '分析模块：数据统计与计算',
+        time: '25分钟',
+        code: `# analyzer.py - 数据分析\nimport pandas as pd\nfrom utils import save_to_csv\n\ndef analyze(movies: list) -> dict:\n    """分析电影数据"""\n    df = pd.DataFrame(movies)\n    \n    # 基本统计\n    stats = {\n        'total': len(df),\n        'avg_rating': df['rating'].mean().round(2),\n        'max_rating': df['rating'].max(),\n        'min_rating': df['rating'].min(),\n        'top_movie': df.loc[df['rating'].idxmax(), 'title'],\n    }\n    \n    # Top10电影\n    top10 = df.nlargest(10, 'rating')[['title', 'rating']].to_dict('records')\n    \n    # 评分分布\n    rating_dist = df['rating'].value_counts().sort_index().to_dict()\n    \n    # 年份统计\n    year_counts = df[df['year'] > 0]['year'].value_counts().sort_index()\n    \n    return {\n        'stats': stats,\n        'top10': top10,\n        'rating_dist': rating_dist,\n        'year_counts': year_counts.to_dict()\n    }\n\ndef print_report(result: dict):\n    """打印分析报告"""\n    s = result['stats']\n    print("\\n" + "="*40)\n    print("📊 数据分析报告")\n    print("="*40)\n    print(f"总计电影: {s['total']} 部")\n    print(f"平均评分: {s['avg_rating']} 分")\n    print(f"最高评分: {s['max_rating']} 分 —《{s['top_movie']}》")\n    print(f"最低评分: {s['min_rating']} 分")\n    print("\\n🏆 Top 10 电影:")\n    for i, m in enumerate(result['top10'], 1):\n        print(f"  {i}. {m['title']} — {m['rating']}分")\n    print("="*40)`,
+        explanation: 'pandas是Python数据分析的利器。DataFrame让表格操作像Excel一样简单：mean()求平均，max()找最大，nlargest()取TopN，value_counts()统计分布。',
+        filename: 'analyzer.py',
+        filepath: 'movie-scraper/',
+        lineRange: '第1-45行',
+        action: 'new-file' as const,
+        description: '使用pandas进行数据统计分析，生成Top10、评分分布、年份统计'
+      },
+      {
+        title: '可视化模块：生成统计图表',
+        time: '30分钟',
+        code: `# visualizer.py - 图表生成\nimport matplotlib.pyplot as plt\n\n# 设置中文字体\nplt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans']\nplt.rcParams['axes.unicode_minus'] = False\n\ndef plot_rating_dist(dist: dict):\n    """评分分布直方图"""\n    plt.figure(figsize=(10, 5))\n    plt.bar(dist.keys(), dist.values(), color='#E88B2E', edgecolor='#B55A00')\n    plt.xlabel('评分', fontsize=12)\n    plt.ylabel('电影数量', fontsize=12)\n    plt.title('豆瓣Top250 评分分布', fontsize=14)\n    plt.tight_layout()\n    plt.savefig('rating_dist.png', dpi=150)\n    plt.close()\n    print("已保存评分分布图: rating_dist.png")\n\ndef plot_top10(top10: list):\n    """Top10电影条形图"""\n    titles = [m['title'][:10] + '...' if len(m['title']) > 10 else m['title'] for m in top10]\n    ratings = [m['rating'] for m in top10]\n    \n    plt.figure(figsize=(10, 6))\n    colors = plt.cm.YlOrRd([0.3 + 0.07 * i for i in range(10)])\n    plt.barh(range(10), ratings, color=colors)\n    plt.yticks(range(10), titles)\n    plt.xlabel('评分', fontsize=12)\n    plt.title('豆瓣Top250 评分Top10', fontsize=14)\n    plt.gca().invert_yaxis()\n    plt.tight_layout()\n    plt.savefig('top10.png', dpi=150)\n    plt.close()\n    print("已保存Top10图表: top10.png")\n\ndef plot_year_trend(years: dict):\n    """年份趋势折线图"""\n    plt.figure(figsize=(12, 5))\n    x = sorted(years.keys())\n    y = [years[k] for k in x]\n    plt.plot(x, y, marker='o', color='#4A90D9', linewidth=2)\n    plt.xlabel('年份', fontsize=12)\n    plt.ylabel('电影数量', fontsize=12)\n    plt.title('豆瓣Top250 年份分布趋势', fontsize=14)\n    plt.grid(True, alpha=0.3)\n    plt.tight_layout()\n    plt.savefig('year_trend.png', dpi=150)\n    plt.close()\n    print("已保存年份趋势图: year_trend.png")`,
+        explanation: 'matplotlib是Python最流行的绘图库。bar()柱状图、barh()水平条形图、plot()折线图。set_figsize()控制尺寸，tight_layout()防止文字被截断。',
+        filename: 'visualizer.py',
+        filepath: 'movie-scraper/',
+        lineRange: '第1-55行',
+        action: 'new-file' as const,
+        description: '使用matplotlib生成评分分布、Top10排名、年份趋势三张图表'
+      },
+      {
+        title: '入口模块：协调全流程',
+        time: '15分钟',
+        code: `# main.py - 程序入口\nfrom scraper import scrape_all\nfrom analyzer import analyze, print_report\nfrom visualizer import plot_rating_dist, plot_top10, plot_year_trend\nfrom utils import save_to_csv\n\ndef main():\n    print("🕷️ 豆瓣电影Top250数据抓取与分析")\n    print("-" * 40)\n    \n    # Step 1: 爬取数据\n    movies = scrape_all()\n    \n    if not movies:\n        print("爬取失败，请检查网络连接")\n        return\n    \n    # Step 2: 保存原始数据\n    save_to_csv(movies)\n    \n    # Step 3: 分析数据\n    result = analyze(movies)\n    print_report(result)\n    \n    # Step 4: 生成图表\n    print("\\n📈 正在生成图表...")\n    plot_rating_dist(result['rating_dist'])\n    plot_top10(result['top10'])\n    plot_year_trend(result['year_counts'])\n    \n    print("\\n✅ 全部完成！")\n    print("输出文件: movies.csv, rating_dist.png, top10.png, year_trend.png")\n\nif __name__ == "__main__":\n    main()`,
+        explanation: 'main.py是程序的"总指挥"，按顺序调用各模块：先爬取，再保存，然后分析，最后可视化。清晰的流程让代码易读易维护。',
+        filename: 'main.py',
+        filepath: 'movie-scraper/',
+        lineRange: '第1-35行',
+        action: 'new-file' as const,
+        description: '协调爬取→保存→分析→可视化的完整流程'
+      }
+    ],
+    keyConcepts: [
+      { name: 'HTTP请求', description: 'requests.get()发送GET请求，headers模拟浏览器访问避免被拒绝' },
+      { name: 'HTML解析', description: 'BeautifulSoup将HTML转为可查询的树结构，find/find_all定位元素' },
+      { name: 'CSS选择器', description: '通过class名（如item、rating_num）定位网页中的数据位置' },
+      { name: '分页爬取', description: '通过修改URL参数（如start=0,25,50...）获取多页数据' },
+      { name: 'DataFrame', description: 'pandas的核心数据结构，类似Excel表格，支持筛选、排序、统计' },
+      { name: 'matplotlib', description: 'Python最流行的绘图库，bar/plot/barh分别绘制柱状图、折线图、条形图' }
+    ],
+    faq: [
+      { q: '爬取时报403 Forbidden', a: '网站拒绝了请求。检查config.py中的User-Agent是否设置，或增加请求间隔时间（time.sleep(1)）。' },
+      { q: '解析不到数据', a: '网页结构可能已更新。用浏览器F12检查元素class名是否与代码中一致。' },
+      { q: '图表中文显示为方块', a: '中文字体未配置。确保plt.rcParams[font.sans-serif]包含系统可用的中文字体。' },
+      { q: 'movies.csv为空或乱码', a: '写入时指定encoding=utf-8，并用newline=防止空行。' }
+    ],
+    githubProjects: [
+      { name: '你的第一个数据项目', stars: '你的', description: '完成后可直接作为GitHub仓库展示' }
+    ],
+    extensions: [
+      { level: 1, text: '添加请求间隔防止被封IP', skill: 'time.sleep + 随机延迟' },
+      { level: 2, text: '爬取详情页获取更多字段（导演、演员、简介）', skill: '深度爬取' },
+      { level: 2, text: '导出为Excel格式（openpyxl）', skill: 'Excel操作' },
+      { level: 3, text: '使用asyncio异步爬取提速', skill: '异步编程' },
+      { level: 4, text: '接入数据库（SQLite）存储数据', skill: '数据库入门' }
+    ]
+  },
+  'markdown-notes': {
+    slug: 'markdown-notes',
+    emoji: '📝',
+    title: 'Markdown笔记Web应用',
+    level: 3,
+    levelLabel: 'Level 3',
+    levelColor: 'from-[#4A90D9] to-[#2E5A8C]',
+    time: '6-8小时',
+    lines: '~300行',
+    stack: ['HTML', 'CSS', 'JavaScript', 'marked.js'],
+    stackColor: 'bg-[#E3F0FC] text-[#2E5A8C]',
+    prerequisites: ['HTML/CSS/JS基础', 'DOM操作', '事件监听', '数组操作'],
+    description: '功能完整的Markdown笔记应用，支持创建/编辑/删除笔记，左右分栏实时预览，标签分类与全文搜索。',
+    whyThisProject: 'TODO应用的自然进阶——从单列表到完整的编辑器+预览器。Markdown是现代开发者的必备技能，这个项目本身就是Markdown的实际应用场景。涉及组件化设计、状态管理、条件渲染等前端核心概念。',
+    image: '/project-notes.jpg',
+    resumeText: '独立开发Markdown笔记Web应用，实现CRUD操作、左右分栏实时预览、标签分类、全文搜索等功能。使用marked.js实现Markdown渲染，LocalStorage实现数据持久化，模块化组件设计。',
+    resumeTags: ['React式组件设计', '状态管理', 'Markdown渲染', 'LocalStorage'],
+    fileStructure: [
+      { name: 'markdown-notes', type: 'folder', description: '项目根文件夹', required: true, children: [
+        { name: 'index.html', type: 'file-core', description: '网页入口', analogy: '房屋大门', required: true },
+        { name: 'style.css', type: 'file-core', description: '全局样式：布局、颜色、动画', analogy: '房屋装修风格', required: true },
+        { name: 'app.js', type: 'file-core', description: '应用主逻辑：状态管理和事件处理', analogy: '房屋的总控制中心', required: true },
+        { name: 'components/', type: 'folder', description: '组件文件夹', required: true, children: [
+          { name: 'Editor.js', type: 'file-core', description: '编辑器：左侧文本输入区域', analogy: '书桌', required: true },
+          { name: 'Preview.js', type: 'file-core', description: '预览器：右侧Markdown渲染', analogy: '显示器', required: true },
+          { name: 'Sidebar.js', type: 'file-core', description: '侧边栏：笔记列表+搜索+新建', analogy: '文件柜', required: true },
+          { name: 'NoteItem.js', type: 'file-core', description: '单个笔记条目', required: true },
+          { name: 'TagFilter.js', type: 'file-core', description: '标签筛选组件', required: true }
+        ]},
+        { name: 'utils/', type: 'folder', description: '工具函数文件夹', required: true, children: [
+          { name: 'storage.js', type: 'file-core', description: 'LocalStorage读写封装', required: true },
+          { name: 'markdown.js', type: 'file-core', description: 'marked.js配置和渲染', required: true },
+          { name: 'search.js', type: 'file-core', description: '全文搜索逻辑', required: true }
+        ]},
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
+    ],
+    steps: [
+      {
+        title: 'HTML结构：左右分栏布局',
+        time: '30分钟',
+        code: `<!-- index.html -->\n<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n  <meta charset="UTF-8">\n  <title>Markdown笔记</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <div class="app">\n    <!-- 侧边栏 -->\n    <aside class="sidebar">\n      <div class="sidebar-header">\n        <h2>📝 我的笔记</h2>\n        <button id="newBtn">+ 新建</button>\n      </div>\n      <input type="text" id="searchInput" placeholder="🔍 搜索笔记...">\n      <div id="tagFilters"></div>\n      <ul id="noteList"></ul>\n    </aside>\n    \n    <!-- 主编辑区 -->\n    <main class="editor-area">\n      <input type="text" id="titleInput" placeholder="笔记标题">\n      <div class="split-pane">\n        <textarea id="editor" placeholder="在此输入Markdown..."></textarea>\n        <div id="preview"></div>\n      </div>\n    </main>\n  </div>\n  <script src="app.js"></script>\n</body>\n</html>`,
+        explanation: '使用aside+main语义化标签。split-pane实现左右分栏，textarea用于输入，div用于预览。',
+        filename: 'index.html',
+        filepath: 'markdown-notes/',
+        lineRange: '第1-30行',
+        action: 'new-file' as const,
+        description: '构建左右分栏的网页骨架：侧边栏+编辑器+预览区'
+      },
+      {
+        title: 'CSS样式：分栏布局与美观设计',
+        time: '45分钟',
+        code: `/* style.css - 核心样式 */\n* { margin: 0; padding: 0; box-sizing: border-box; }\n\n.app {\n  display: flex;\n  height: 100vh;\n  font-family: -apple-system, BlinkMacSystemFont, sans-serif;\n}\n\n.sidebar {\n  width: 280px;\n  background: #f5f5f5;\n  border-right: 1px solid #ddd;\n  display: flex;\n  flex-direction: column;\n  padding: 16px;\n}\n\n.sidebar-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 12px;\n}\n\n#newBtn {\n  background: #E88B2E;\n  color: white;\n  border: none;\n  padding: 6px 14px;\n  border-radius: 6px;\n  cursor: pointer;\n}\n\n#searchInput {\n  padding: 8px 12px;\n  border: 1px solid #ddd;\n  border-radius: 6px;\n  margin-bottom: 12px;\n}\n\n#noteList {\n  list-style: none;\n  overflow-y: auto;\n  flex: 1;\n}\n\n.note-item {\n  padding: 10px 12px;\n  border-radius: 8px;\n  cursor: pointer;\n  margin-bottom: 4px;\n  transition: background 0.15s;\n}\n\n.note-item:hover {\n  background: #e8e8e8;\n}\n\n.note-item.active {\n  background: #E88B2E;\n  color: white;\n}\n\n.editor-area {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n}\n\n#titleInput {\n  padding: 12px 20px;\n  font-size: 20px;\n  font-weight: bold;\n  border: none;\n  border-bottom: 1px solid #eee;\n  outline: none;\n}\n\n.split-pane {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n#editor {\n  flex: 1;\n  padding: 20px;\n  border: none;\n  border-right: 1px solid #eee;\n  font-family: 'Courier New', monospace;\n  font-size: 14px;\n  line-height: 1.8;\n  resize: none;\n  outline: none;\n}\n\n#preview {\n  flex: 1;\n  padding: 20px;\n  overflow-y: auto;\n  line-height: 1.8;\n}`,
+        explanation: 'flex布局实现自适应分栏。vh单位让应用占满视口高度。textarea的resize:none防止用户拖拽改变大小。',
+        filename: 'style.css',
+        filepath: 'markdown-notes/',
+        lineRange: '第1-95行',
+        action: 'new-file' as const,
+        description: '使用Flexbox实现左右分栏布局，设计侧边栏和编辑区样式'
+      },
+      {
+        title: '核心逻辑：状态管理与CRUD操作',
+        time: '60分钟',
+        code: `// app.js - 应用主逻辑\nlet notes = [];\nlet activeNoteId = null;\nlet filterTag = 'all';\n\n// DOM元素\nconst editor = document.getElementById('editor');\nconst preview = document.getElementById('preview');\nconst titleInput = document.getElementById('titleInput');\nconst noteList = document.getElementById('noteList');\nconst searchInput = document.getElementById('searchInput');\nconst newBtn = document.getElementById('newBtn');\n\n// 初始化\nfunction init() {\n  notes = loadNotes();\n  if (notes.length === 0) {\n    createNote();\n  }\n  activeNoteId = notes[0].id;\n  renderNoteList();\n  loadActiveNote();\n  setupEventListeners();\n}\n\n// 创建新笔记\nfunction createNote() {\n  const note = {\n    id: Date.now(),\n    title: '未命名笔记',\n    content: '# 新笔记\\n\\n开始写作...',\n    tag: '未分类',\n    updatedAt: new Date().toISOString()\n  };\n  notes.unshift(note);\n  activeNoteId = note.id;\n  saveNotes();\n  renderNoteList();\n  loadActiveNote();\n}\n\n// 保存当前笔记\nfunction saveCurrentNote() {\n  const note = notes.find(n => n.id === activeNoteId);\n  if (note) {\n    note.title = titleInput.value || '未命名';\n    note.content = editor.value;\n    note.updatedAt = new Date().toISOString();\n    saveNotes();\n    renderNoteList();\n  }\n}\n\n// 删除笔记\nfunction deleteNote(id) {\n  if (!confirm('确定删除此笔记？')) return;\n  notes = notes.filter(n => n.id !== id);\n  if (notes.length === 0) createNote();\n  if (activeNoteId === id) activeNoteId = notes[0].id;\n  saveNotes();\n  renderNoteList();\n  loadActiveNote();\n}\n\n// 加载当前笔记到编辑器\nfunction loadActiveNote() {\n  const note = notes.find(n => n.id === activeNoteId);\n  if (!note) return;\n  titleInput.value = note.title;\n  editor.value = note.content;\n  renderPreview();\n}\n\n// 渲染预览\nfunction renderPreview() {\n  preview.innerHTML = marked.parse(editor.value);\n}\n\n// 渲染笔记列表\nfunction renderNoteList() {\n  let filtered = notes;\n  \n  // 标签筛选\n  if (filterTag !== 'all') {\n    filtered = filtered.filter(n => n.tag === filterTag);\n  }\n  \n  // 搜索筛选\n  const keyword = searchInput.value.trim().toLowerCase();\n  if (keyword) {\n    filtered = filtered.filter(n =>\n      n.title.toLowerCase().includes(keyword) ||\n      n.content.toLowerCase().includes(keyword)\n    );\n  }\n  \n  // 排序：最近编辑在前\n  filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));\n  \n  noteList.innerHTML = filtered.map(note =>\n    \`<li class="note-item \${note.id === activeNoteId ? 'active' : ''}"\n        onclick="selectNote(\${note.id})"\n        oncontextmenu="event.preventDefault(); deleteNote(\${note.id})">\n      <div class="note-title">\${note.title}</div>\n      <div class="note-meta">\${note.tag} · \${formatDate(note.updatedAt)}</div>\n    </li>\`\n  ).join('');\n}\n\n// 选择笔记\nfunction selectNote(id) {\n  saveCurrentNote();\n  activeNoteId = id;\n  renderNoteList();\n  loadActiveNote();\n}\n\n// 事件监听\nfunction setupEventListeners() {\n  editor.addEventListener('input', () => {\n    saveCurrentNote();\n    renderPreview();\n  });\n  titleInput.addEventListener('input', saveCurrentNote);\n  searchInput.addEventListener('input', renderNoteList);\n  newBtn.addEventListener('click', createNote);\n}\n\n// 启动\ndocument.addEventListener('DOMContentLoaded', init);`,
+        explanation: '这是整个应用的核心。状态（notes数组+activeNoteId）驱动UI渲染。每次编辑自动保存到LocalStorage。input事件实现实时预览。',
+        filename: 'app.js',
+        filepath: 'markdown-notes/',
+        lineRange: '第1-125行',
+        action: 'new-file' as const,
+        description: '实现状态管理、CRUD操作、搜索筛选、实时预览等核心逻辑'
+      },
+      {
+        title: '工具模块：Storage、Markdown渲染、搜索',
+        time: '30分钟',
+        code: `// utils/storage.js - LocalStorage封装\nconst STORAGE_KEY = 'markdown_notes';\n\nfunction loadNotes() {\n  try {\n    const data = localStorage.getItem(STORAGE_KEY);\n    return data ? JSON.parse(data) : [];\n  } catch {\n    return [];\n  }\n}\n\nfunction saveNotes() {\n  localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));\n}\n\nfunction formatDate(iso) {\n  const d = new Date(iso);\n  return \`\${d.getMonth()+1}/\${d.getDate()} \${d.getHours()}:\${String(d.getMinutes()).padStart(2,'0')}\`;\n}\n\n// utils/markdown.js - marked.js配置\nmarked.setOptions({\n  breaks: true,\n  gfm: true,\n  highlight: function(code, lang) {\n    return code;\n  }\n});\n\n// 标签颜色\nconst TAG_COLORS = {\n  '工作': '#E88B2E',\n  '学习': '#4A90D9',\n  '灵感': '#7BA37E',\n  '待整理': '#8A8A8A',\n  '未分类': '#C07BA0'\n};`,
+        explanation: 'storage.js封装LocalStorage操作，加try/catch防止隐私模式报错。marked.setOptions配置Markdown解析选项。',
+        filename: 'utils/storage.js',
+        filepath: 'markdown-notes/',
+        lineRange: '第1-35行',
+        action: 'new-file' as const,
+        description: '封装LocalStorage读写、配置marked.js、定义标签颜色'
+      }
+    ],
+    keyConcepts: [
+      { name: '状态驱动UI', description: '数据（notes数组）变化时重新渲染界面，而不是直接操作DOM修改单个元素' },
+      { name: 'LocalStorage持久化', description: '浏览器本地键值对存储，页面刷新后数据不丢失。容量约5MB' },
+      { name: '实时预览', description: 'textarea的input事件触发Markdown重新渲染，实现打字即时预览' },
+      { name: 'Flexbox分栏', description: 'display:flex让子元素自适应排列，flex:1占据剩余空间' },
+      { name: '事件委托 vs 直接绑定', description: '动态生成的元素用onclick直接绑定，静态元素用addEventListener' },
+      { name: 'Markdown语法', description: '#标题 **粗体** *斜体* `代码` [链接](url) 等标记语言' }
+    ],
+    faq: [
+      { q: '预览不实时更新', a: '检查editor的input事件是否正确绑定到renderPreview()。确保marked.js已加载。' },
+      { q: '刷新后笔记丢失', a: '检查saveNotes()是否在每次编辑后调用。确认LocalStorage未被浏览器清除。' },
+      { q: 'Markdown表格渲染异常', a: 'marked.js默认支持GFM表格。确保表格语法正确（| 列1 | 列2 |）。' },
+      { q: '笔记列表不显示', a: '检查renderNoteList()是否被调用。确认notes数组非空。' }
+    ],
+    githubProjects: [
+      { name: '你的第一个React式应用', stars: '你的', description: '可作为组件化设计的入门参考' }
+    ],
+    extensions: [
+      { level: 1, text: 'Dark Mode 切换', skill: 'CSS变量 + 主题切换' },
+      { level: 2, text: '导入/导出 Markdown 文件', skill: 'File API' },
+      { level: 2, text: '笔记导出 PDF', skill: 'html2pdf.js' },
+      { level: 3, text: '添加笔记分类文件夹', skill: '嵌套数据结构' },
+      { level: 4, text: '接入后端 API 实现云同步', skill: '前后端交互' }
+    ]
+  },
+  'site-monitor': {
+    slug: 'site-monitor',
+    emoji: '🌐',
+    title: '网站状态监控工具',
+    level: 3,
+    levelLabel: 'Level 3',
+    levelColor: 'from-[#4A90D9] to-[#2E5A8C]',
+    time: '4-6小时',
+    lines: '~200行',
+    stack: ['Python', 'requests', 'asyncio', 'JSON配置'],
+    stackColor: 'bg-[#E3F0FC] text-[#2E5A8C]',
+    prerequisites: ['Python基础', '文件读写', '字典操作', 'JSON基础'],
+    description: '命令行工具，批量检查多个网站的HTTP状态码和响应时间，生成彩色状态报告并保存到日志文件。',
+    whyThisProject: 'DevOps/SRE方向入门项目。引入asyncio异步编程——Python高性能编程的核心。配置文件驱动设计是真实工程项目的常见模式。彩色终端输出让初学者感受到"专业工具"的成就感。',
+    image: '/project-monitor.jpg',
+    resumeText: '开发异步网站状态监控工具，使用asyncio实现并发HTTP检测，JSON配置文件驱动，支持响应时间测量与彩色状态报告。可配置监控目标、检查频率与超时阈值，适用于小型服务的可用性监控。',
+    resumeTags: ['异步编程', 'DevOps', '配置驱动', '并发检测'],
+    fileStructure: [
+      { name: 'site-monitor', type: 'folder', description: '项目根文件夹', required: true, children: [
+        { name: 'monitor.py', type: 'file-core', description: '核心监控逻辑：异步HTTP检查', analogy: '检测员，实际执行检查任务的人', required: true },
+        { name: 'reporter.py', type: 'file-core', description: '报告生成：彩色终端+日志文件', analogy: '秘书，整理检查结果并汇报', required: true },
+        { name: 'config.py', type: 'file-core', description: '配置管理：读取JSON配置', analogy: '导航手册', required: true },
+        { name: 'main.py', type: 'file-core', description: '入口：命令行参数解析', analogy: '前台接待', required: true },
+        { name: 'sites.json', type: 'file-config', description: '网站列表配置', required: true },
+        { name: 'history.log', type: 'file-data', description: '检查结果日志（运行时创建）', required: false },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
+    ],
+    steps: [
+      {
+        title: '配置文件：定义监控目标',
+        time: '10分钟',
+        code: `{\n  "sites": [\n    { "name": "GitHub", "url": "https://github.com", "expected_status": 200 },\n    { "name": "百度", "url": "https://www.baidu.com", "expected_status": 200 },\n    { "name": "我的网站", "url": "https://example.com", "expected_status": 200 },\n    { "name": "测试404页面", "url": "https://httpbin.org/status/404", "expected_status": 404 }\n  ],\n  "timeout": 10,\n  "interval": 300,\n  "log_file": "history.log"\n}`,
+        explanation: 'JSON格式清晰易读，name用于显示，url是检查目标，expected_status定义期望的HTTP状态码。',
+        filename: 'sites.json',
+        filepath: 'site-monitor/',
+        lineRange: '第1-15行',
+        action: 'new-file' as const,
+        description: '用JSON配置定义要监控的网站列表和参数'
+      },
+      {
+        title: '配置模块：读取和管理配置',
+        time: '15分钟',
+        code: `# config.py - 配置管理\nimport json\n\ndef load_config(path: str = "sites.json") -> dict:\n    """读取JSON配置文件"""\n    try:\n        with open(path, 'r', encoding='utf-8') as f:\n            return json.load(f)\n    except FileNotFoundError:\n        print(f"❌ 配置文件不存在: {path}")\n        return {\n            "sites": [],\n            "timeout": 10,\n            "interval": 300\n        }\n    except json.JSONDecodeError:\n        print(f"❌ JSON格式错误: {path}")\n        return {\n            "sites": [],\n            "timeout": 10,\n            "interval": 300\n        }\n\ndef validate_config(config: dict) -> bool:\n    """验证配置是否有效"""\n    if not config.get("sites"):\n        print("⚠️ 监控列表为空，请检查sites.json")\n        return False\n    for site in config["sites"]:\n        if "url" not in site:\n            print(f"⚠️ {site.get('name', '?')} 缺少url字段")\n            return False\n    return True`,
+        explanation: '配置文件独立管理，方便修改监控目标而不动代码。添加异常处理防止配置文件缺失或格式错误导致程序崩溃。',
+        filename: 'config.py',
+        filepath: 'site-monitor/',
+        lineRange: '第1-30行',
+        action: 'new-file' as const,
+        description: '读取JSON配置文件，添加异常处理和配置验证'
+      },
+      {
+        title: '监控模块：异步HTTP检测',
+        time: '35分钟',
+        code: `# monitor.py - 核心监控逻辑\nimport asyncio\nimport time\nimport requests\n\nasync def check_site(session, site: dict, timeout: int) -> dict:\n    """检查单个网站状态"""\n    url = site["url"]\n    name = site.get("name", url)\n    expected = site.get("expected_status", 200)\n    \n    result = {\n        "name": name,\n        "url": url,\n        "status": None,\n        "response_time": 0,\n        "expected": expected,\n        "ok": False,\n        "error": None\n    }\n    \n    start = time.time()\n    try:\n        # 在线程池中运行同步的requests\n        loop = asyncio.get_event_loop()\n        response = await asyncio.wait_for(\n            loop.run_in_executor(None, lambda: requests.get(url, timeout=timeout)),\n            timeout=timeout + 5\n        )\n        result["status"] = response.status_code\n        result["ok"] = (response.status_code == expected)\n    except asyncio.TimeoutError:\n        result["error"] = "请求超时"\n    except requests.RequestException as e:\n        result["error"] = str(e)\n    finally:\n        result["response_time"] = round((time.time() - start) * 1000, 2)\n    \n    return result\n\nasync def check_all(config: dict) -> list:\n    """并发检查所有网站"""\n    sites = config["sites"]\n    timeout = config.get("timeout", 10)\n    \n    tasks = [check_site(None, site, timeout) for site in sites]\n    results = await asyncio.gather(*tasks, return_exceptions=True)\n    \n    # 处理异常结果\n    return [r if isinstance(r, dict) else {\n        "name": "?", "url": "?", "status": None,\n        "ok": False, "error": str(r), "response_time": 0\n    } for r in results]`,
+        explanation: 'asyncio.gather并发执行多个检查任务，大幅提速。run_in_executor将同步的requests包在线程池中运行，避免阻塞事件循环。',
+        filename: 'monitor.py',
+        filepath: 'site-monitor/',
+        lineRange: '第1-55行',
+        action: 'new-file' as const,
+        description: '使用asyncio实现异步并发HTTP检测，测量响应时间'
+      },
+      {
+        title: '报告模块：彩色终端输出与日志',
+        time: '25分钟',
+        code: `# reporter.py - 报告生成\nfrom datetime import datetime\n\n# ANSI颜色代码\nGREEN = "\\033[32m"\nRED = "\\033[31m"\nYELLOW = "\\033[33m"\nRESET = "\\033[0m"\nBOLD = "\\033[1m"\n\ndef format_result(r: dict) -> str:\n    """格式化单个检查结果"""\n    name = r["name"]\n    url = r["url"]\n    status = r["status"]\n    ms = r["response_time"]\n    ok = r["ok"]\n    error = r["error"]\n    \n    if ok:\n        return f"{GREEN}✓{RESET} {BOLD}{name}{RESET} — {status} ({ms}ms)"\n    elif error:\n        return f"{YELLOW}◆{RESET} {BOLD}{name}{RESET} — {error}"\n    else:\n        return f"{RED}✗{RESET} {BOLD}{name}{RESET} — {status} (期望{r['expected']}) ({ms}ms)"\n\ndef print_report(results: list):\n    """打印彩色终端报告"""\n    print(f"\\n{BOLD}🌐 网站状态监控报告{RESET}")\n    print(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")\n    print("-" * 50)\n    \n    ok_count = sum(1 for r in results if r["ok"])\n    fail_count = len(results) - ok_count\n    \n    for r in results:\n        print(format_result(r))\n    \n    print("-" * 50)\n    print(f"总计: {len(results)} | {GREEN}正常{ok_count}{RESET} | {RED}异常{fail_count}{RESET}\\n")\n\ndef save_log(results: list, log_file: str):\n    """保存检查历史到日志"""\n    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')\n    with open(log_file, 'a', encoding='utf-8') as f:\n        f.write(f"\\n[{timestamp}]\\n")\n        for r in results:\n            status_str = "OK" if r["ok"] else (f"ERROR:{r['error']}" if r['error'] else f"FAIL:{r['status']}")\n            f.write(f"  {r['name']}: {status_str} ({r['response_time']}ms)\\n")\n    print(f"📄 日志已保存: {log_file}")`,
+        explanation: 'ANSI转义码实现彩色终端输出（\\033[32m=绿色）。绿色✓正常、黄色◆超时、红色✗异常。a模式追加写入日志，保留历史记录。',
+        filename: 'reporter.py',
+        filepath: 'site-monitor/',
+        lineRange: '第1-55行',
+        action: 'new-file' as const,
+        description: '使用ANSI颜色代码生成彩色终端报告，并保存检查日志'
+      },
+      {
+        title: '入口模块：命令行参数与定时模式',
+        time: '15分钟',
+        code: `# main.py - 程序入口\nimport asyncio\nimport sys\nimport time\nfrom config import load_config, validate_config\nfrom monitor import check_all\nfrom reporter import print_report, save_log\n\ndef main():\n    # 解析命令行参数\n    config_path = sys.argv[1] if len(sys.argv) > 1 else "sites.json"\n    loop_mode = "--loop" in sys.argv\n    \n    # 加载配置\n    config = load_config(config_path)\n    if not validate_config(config):\n        return\n    \n    sites = config["sites"]\n    interval = config.get("interval", 300)\n    log_file = config.get("log_file", "history.log")\n    \n    print(f"📋 监控目标: {len(sites)} 个网站")\n    for s in sites:\n        print(f"   • {s['name']}: {s['url']}")\n    print(f"⏱️  超时: {config.get('timeout', 10)}s | 间隔: {interval}s")\n    if loop_mode:\n        print(f"🔄 定时模式: 每 {interval} 秒检查一次\\n")\n    \n    # 执行检查\n    while True:\n        results = asyncio.run(check_all(config))\n        print_report(results)\n        save_log(results, log_file)\n        \n        if not loop_mode:\n            break\n        \n        print(f"⏳ {interval}秒后再次检查...\\n")\n        time.sleep(interval)\n\nif __name__ == "__main__":\n    main()`,
+        explanation: 'asyncio.run()启动事件循环执行异步检查。--loop参数启用定时模式。sys.argv解析命令行参数，让工具更灵活。',
+        filename: 'main.py',
+        filepath: 'site-monitor/',
+        lineRange: '第1-40行',
+        action: 'new-file' as const,
+        description: '命令行参数解析，支持单次检查和定时循环模式'
+      }
+    ],
+    keyConcepts: [
+      { name: 'asyncio', description: 'Python异步编程库，用async/await实现非阻塞IO，适合并发网络请求' },
+      { name: '并发 vs 并行', description: '并发是交替执行多个任务（IO等待时切换），并行是同时执行（多核CPU）。asyncio实现并发' },
+      { name: 'run_in_executor', description: '将同步代码（如requests）放到线程池中运行，避免阻塞异步事件循环' },
+      { name: 'ANSI颜色码', description: '终端控制字符\\033[32m设置绿色、\\033[0m重置，让输出更美观' },
+      { name: '配置文件驱动', description: '将可变参数（监控目标、超时时间）放到配置文件，代码不动只改配置' },
+      { name: 'HTTP状态码', description: '200正常、301/302重定向、404不存在、500服务器错误、503服务不可用' }
+    ],
+    faq: [
+      { q: '所有网站都显示超时', a: '检查网络连接。确认config.py中的timeout值是否太小（建议>=10秒）。' },
+      { q: '颜色代码显示为乱码', a: 'Windows CMD默认不支持ANSI颜色。使用Windows Terminal或PowerShell。' },
+      { q: 'asyncio报错RuntimeError', a: '确保在async函数中使用await。asyncio.run()只能调用一次，不要嵌套。' },
+      { q: '日志文件越来越大', a: '添加日志轮转功能，或定期清理旧日志。可用logging模块替代手写。' }
+    ],
+    githubProjects: [
+      { name: '你的第一个DevOps工具', stars: '你的', description: '可作为运维自动化的入门项目' }
+    ],
+    extensions: [
+      { level: 1, text: '添加邮件告警通知', skill: 'smtplib邮件发送' },
+      { level: 2, text: '历史数据可视化趋势图', skill: 'matplotlib时间序列' },
+      { level: 2, text: '支持HTTP Basic Auth认证', skill: '请求头配置' },
+      { level: 3, text: '导出为Prometheus exporter格式', skill: '指标暴露格式' },
+      { level: 4, text: 'Web管理界面（Flask）', skill: 'Web框架入门' }
+    ]
+  },
 }
 
 /* ──────────────────── helpers ──────────────────── */

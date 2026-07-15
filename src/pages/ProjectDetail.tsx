@@ -15,10 +15,23 @@ import {
   Github,
   Star,
   Folder,
+  Download,
+  FileArchive,
+  Terminal,
+  Globe,
+  Package,
+  Play,
 } from 'lucide-react'
 import FileTree from '../components/FileTree'
 import CodeBlockWithHeader from '../components/CodeBlockWithHeader'
 import StepFileTree from '../components/StepFileTree'
+import {
+  getProjectTemplate,
+  hasTemplate,
+  generateFullCodeZip,
+  generateSkeletonZip,
+  downloadBlob,
+} from '../data/project-templates'
 
 /* ───────────────────────── types ───────────────────────── */
 
@@ -938,8 +951,10 @@ export default function ProjectDetail() {
   const [openStep, setOpenStep] = useState<number | null>(0)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [copied, setCopied] = useState(false)
+  const [downloading, setDownloading] = useState<'full' | 'skeleton' | null>(null)
 
   const project = slug ? projectDetails[slug] : undefined
+  const template = slug && hasTemplate(slug) ? getProjectTemplate(slug) : undefined
 
   const copyResume = useCallback(() => {
     if (!project) return
@@ -947,6 +962,31 @@ export default function ProjectDetail() {
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [project])
+
+  /* ── download handlers ── */
+  const handleDownloadFull = useCallback(async () => {
+    if (!slug) return
+    setDownloading('full')
+    try {
+      const blob = await generateFullCodeZip(slug)
+      downloadBlob(blob, `${slug}-完整代码.zip`)
+    } catch (e) {
+      console.error('Download failed:', e)
+    }
+    setDownloading(null)
+  }, [slug])
+
+  const handleDownloadSkeleton = useCallback(async () => {
+    if (!slug) return
+    setDownloading('skeleton')
+    try {
+      const blob = await generateSkeletonZip(slug)
+      downloadBlob(blob, `${slug}-项目骨架.zip`)
+    } catch (e) {
+      console.error('Download failed:', e)
+    }
+    setDownloading(null)
+  }, [slug])
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -1264,6 +1304,201 @@ export default function ProjectDetail() {
           </motion.div>
         </div>
       </section>
+
+      {/* ── Environment Setup & Download Section ── */}
+      {template && (
+        <section className="py-8">
+          <div className="mx-auto max-w-4xl px-6">
+            {/* 环境配置指南 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-white rounded-xl border border-[#E5E0D5] p-6 mb-6"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#4A90D9] to-[#2E5A8C] flex items-center justify-center text-white">
+                  <Terminal className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-display text-xl font-bold text-[#2A2A2A]">
+                    环境配置
+                  </h2>
+                  <p className="text-xs text-[#8A8A8A]">
+                    开始项目前，先配置好运行环境
+                  </p>
+                </div>
+              </div>
+
+              {/* 依赖说明 */}
+              <div className="space-y-4">
+                {/* 运行环境 */}
+                <div className="flex items-start gap-3 p-4 bg-[#F4EFE6] rounded-lg">
+                  {template.env.runtime === 'python' ? (
+                    <Terminal className="h-5 w-5 text-[#E88B2E] flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <Globe className="h-5 w-5 text-[#7BA37E] flex-shrink-0 mt-0.5" />
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-[#2A2A2A]">
+                      {template.env.runtime === 'python'
+                        ? 'Python 命令行运行'
+                        : '浏览器直接运行'}
+                    </p>
+                    <p className="text-xs text-[#8A8A8A] mt-1">
+                      {template.env.runtime === 'python'
+                        ? '需要在电脑终端中运行 Python 程序'
+                        : '无需安装任何软件，直接用浏览器打开 HTML 文件'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 依赖列表 */}
+                {template.env.hasDependencies && (
+                  <div className="p-4 bg-[#FFF0EB] rounded-lg border border-[#FDE8D8]">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Package className="h-4 w-4 text-[#F27B4C]" />
+                      <p className="text-sm font-semibold text-[#2A2A2A]">
+                        需要安装的依赖
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {template.env.dependencies.map((dep) => (
+                        <span
+                          key={dep}
+                          className="px-2.5 py-1 rounded-full bg-white text-[#F27B4C] text-xs font-medium border border-[#FDE8D8]"
+                        >
+                          {dep}
+                        </span>
+                      ))}
+                    </div>
+                    {template.env.pipCommand && (
+                      <div className="relative">
+                        <code className="block bg-[#2A2A2A] text-white text-sm p-3 rounded-lg font-mono overflow-x-auto">
+                          {template.env.pipCommand}
+                        </code>
+                        <p className="text-xs text-[#8A8A8A] mt-1.5">
+                          在终端中运行上方命令安装依赖
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!template.env.hasDependencies && (
+                  <div className="p-4 bg-[#E8F0E9] rounded-lg border border-[#D4E5D6]">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-[#5C8A5F]" />
+                      <p className="text-sm font-medium text-[#2A2A2A]">
+                        无需安装任何依赖
+                      </p>
+                    </div>
+                    <p className="text-xs text-[#8A8A8A] mt-1">
+                      本项目使用 Python 内置库或浏览器原生 API，无需额外安装
+                    </p>
+                  </div>
+                )}
+
+                {/* 安装步骤 */}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-[#2A2A2A]">安装步骤：</p>
+                  {template.env.installInstructions.map((inst, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm text-[#4A4A4A]">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#FDF3E8] text-[#B55A00] text-xs font-bold flex items-center justify-center mt-0.5">
+                        {i + 1}
+                      </span>
+                      <span>{inst}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 运行步骤 */}
+                <div className="pt-3 border-t border-[#E5E0D5] space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Play className="h-4 w-4 text-[#E88B2E]" />
+                    <p className="text-sm font-semibold text-[#2A2A2A]">运行项目</p>
+                  </div>
+                  <code className="block bg-[#2A2A2A] text-white text-sm p-3 rounded-lg font-mono overflow-x-auto">
+                    {template.env.runCommand}
+                  </code>
+                  <div className="space-y-1">
+                    {template.env.runInstructions.map((inst, i) => (
+                      <p key={i} className="text-xs text-[#8A8A8A] flex items-start gap-1.5">
+                        <span className="flex-shrink-0">•</span>
+                        <span>{inst}</span>
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* 模板下载 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="bg-white rounded-xl border border-[#E5E0D5] p-6"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#E88B2E] to-[#B55A00] flex items-center justify-center text-white">
+                  <Download className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-display text-xl font-bold text-[#2A2A2A]">
+                    下载项目模板
+                  </h2>
+                  <p className="text-xs text-[#8A8A8A]">
+                    跟着网页指南一步步实现，或下载模板开始编码
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* 完整代码下载 */}
+                <button
+                  onClick={handleDownloadFull}
+                  disabled={downloading === 'full'}
+                  className="group flex flex-col items-start p-5 rounded-xl border-2 border-[#E5E0D5] hover:border-[#E88B2E] transition-all duration-300 hover:shadow-md disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileArchive className="h-5 w-5 text-[#E88B2E]" />
+                    <span className="font-semibold text-[#2A2A2A]">完整项目代码</span>
+                  </div>
+                  <p className="text-sm text-[#8A8A8A] text-left mb-3">
+                    包含所有文件的完整实现代码，可直接运行。适合对照学习或直接使用。
+                  </p>
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-[#E88B2E] group-hover:underline">
+                    <Download className="h-4 w-4" />
+                    {downloading === 'full' ? '打包中...' : '下载 .zip'}
+                  </span>
+                </button>
+
+                {/* 骨架模板下载 */}
+                <button
+                  onClick={handleDownloadSkeleton}
+                  disabled={downloading === 'skeleton'}
+                  className="group flex flex-col items-start p-5 rounded-xl border-2 border-[#E5E0D5] hover:border-[#4A90D9] transition-all duration-300 hover:shadow-md disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Folder className="h-5 w-5 text-[#4A90D9]" />
+                    <span className="font-semibold text-[#2A2A2A]">项目骨架</span>
+                  </div>
+                  <p className="text-sm text-[#8A8A8A] text-left mb-3">
+                    只包含文件结构和注释说明，代码部分为空。适合跟着网页指南亲手实现。
+                  </p>
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-[#4A90D9] group-hover:underline">
+                    <Download className="h-4 w-4" />
+                    {downloading === 'skeleton' ? '打包中...' : '下载 .zip'}
+                  </span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* ── Steps Section ── */}
       <section id="steps" className="py-8">

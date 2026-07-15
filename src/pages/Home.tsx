@@ -1,6 +1,5 @@
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { Link } from 'react-router'
-import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion'
 import {
   Clock,
   Code2,
@@ -14,7 +13,49 @@ import {
   BookOpen,
   Briefcase,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+
+// ── Custom useInView Hook ───────────────────────────────────────────
+function useInView(ref: React.RefObject<HTMLElement | null>, options?: { once?: boolean; margin?: string }) {
+  const [isInView, setIsInView] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true)
+          if (options?.once) observer.unobserve(el)
+        } else if (!options?.once) {
+          setIsInView(false)
+        }
+      },
+      { rootMargin: options?.margin || '0px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  return isInView
+}
+
+// ── CSS Animation Styles ────────────────────────────────────────────
+const animationStyles = `
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+`
 
 // ── Project Data ────────────────────────────────────────────────────
 const projects = [
@@ -155,22 +196,11 @@ const levelConfig: Record<
     desc: '涉及前端开发和外部API调用',
     icon: Globe,
   },
-}
-
-// ── Animation Variants ──────────────────────────────────────────────
-const staggerContainer = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.1 },
-  },
-}
-
-const staggerChild = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+  3: {
+    gradient: 'from-[#4A90D9] to-[#2E5A8C]',
+    text: '进阶项目 — 多文件工程',
+    desc: '涉及多模块协作和工程化实践',
+    icon: Globe,
   },
 }
 
@@ -178,23 +208,23 @@ const staggerChild = {
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
-  const count = useMotionValue(0)
-  const rounded = useTransform(count, (v) => Math.round(v))
   const [display, setDisplay] = useState(0)
 
   useEffect(() => {
     if (isInView) {
-      const controls = animate(count, target, {
-        duration: 1.5,
-        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-      })
-      const unsubscribe = rounded.on('change', (v) => setDisplay(v))
-      return () => {
-        controls.stop()
-        unsubscribe()
+      let start = 0
+      const duration = 1500
+      const startTime = performance.now()
+      const tick = (now: number) => {
+        const elapsed = now - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        start = Math.round(progress * target)
+        setDisplay(start)
+        if (progress < 1) requestAnimationFrame(tick)
       }
+      requestAnimationFrame(tick)
     }
-  }, [isInView, target, count, rounded])
+  }, [isInView, target])
 
   return (
     <span ref={ref}>
@@ -210,6 +240,7 @@ function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: str
 export default function Home() {
   return (
     <div>
+      <style>{animationStyles}</style>
       <HeroSection />
       <ProjectsSection />
       <LevelExplanationSection />
@@ -241,47 +272,31 @@ function HeroSection() {
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         {/* Tagline */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="text-sm uppercase tracking-[2px] text-[#E88B2E] font-display font-semibold mb-6"
+        <p
+          className="text-sm uppercase tracking-[2px] text-[#E88B2E] font-display font-semibold mb-6 animate-[fadeInUp_0.6s_ease-out_forwards]"
         >
           编程项目第一站
-        </motion.p>
+        </p>
 
         {/* Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-          className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6"
+        <h1
+          className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 animate-[fadeInUp_1s_ease-out_0.15s_both]"
         >
           从零开始，
           <br />
           跑通你的第一个项目
-        </motion.h1>
+        </h1>
 
         {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-[#8A8A8A] text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed"
+        <p
+          className="text-[#8A8A8A] text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed animate-[fadeIn_0.8s_ease-out_0.5s_both]"
         >
           CodeFirst 为零基础转码者精选人生第一个实战项目。每个项目都有清晰步骤、真实代码和简历写法。
-        </motion.p>
+        </p>
 
         {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: 0.6,
-            delay: 0.7,
-            ease: [0.68, -0.55, 0.265, 1.55] as [number, number, number, number],
-          }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+        <div
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-[scaleIn_0.6s_ease-out_0.7s_both]"
         >
           <Link
             to="/projects"
@@ -296,7 +311,7 @@ function HeroSection() {
           >
             查看学习路径
           </Link>
-        </motion.div>
+        </div>
 
         {/* Floating Badges */}
         <div className="mt-16 flex flex-wrap items-center justify-center gap-3">
@@ -306,60 +321,41 @@ function HeroSection() {
             { label: 'JavaScript', className: 'bg-[#F3E8F0] text-[#C07BA0]', delay: 1 },
             { label: '2小时上手', className: 'bg-white text-[#F27B4C]', delay: 1.5 },
           ].map((badge) => (
-            <motion.span
+            <span
               key={badge.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: [0, -8, 0] }}
-              transition={{
-                opacity: { duration: 0.5, delay: badge.delay + 0.8 },
-                y: {
-                  duration: 3 + badge.delay,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: badge.delay,
-                },
-              }}
-              className={`inline-block px-4 py-1.5 rounded-full text-xs font-medium ${badge.className}`}
+              style={{ animationDelay: `${badge.delay + 0.8}s` }}
+              className={`inline-block px-4 py-1.5 rounded-full text-xs font-medium animate-[fadeInUp_0.5s_ease-out_forwards] opacity-0 ${badge.className}`}
             >
               {badge.label}
-            </motion.span>
+            </span>
           ))}
         </div>
       </div>
 
       {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-[fadeIn_0.6s_ease-out_1.2s_both]"
       >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
+        <div className="animate-[bounce_2s_ease-in-out_infinite]">
           <ChevronDown className="h-6 w-6 text-white/50" />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   )
 }
 
 // ── Section 2: Featured Projects ───────────────────────────────────
 function ProjectsSection() {
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
   return (
     <section className="bg-[#F4EFE6] py-20">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section Header */}
-        <motion.div
+        <div
           ref={ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className={`text-center mb-12 transition-all duration-600 ${isInView ? 'animate-[fadeInUp_0.6s_ease-out_forwards]' : 'opacity-0'}`}
         >
           <h2 className="font-display text-3xl md:text-4xl font-bold text-[#2A2A2A] mb-3">
             精选项目
@@ -367,36 +363,32 @@ function ProjectsSection() {
           <p className="text-[#8A8A8A] text-base max-w-md mx-auto">
             从零代码片段到完整网页应用，每个项目都经过精心设计
           </p>
-        </motion.div>
+        </div>
 
         {/* Project Grid */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project, i) => (
+            <ProjectCard key={project.id} project={project} index={i} isInView={isInView} />
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   )
 }
 
 // ── Project Card Component ─────────────────────────────────────────
-function ProjectCard({ project }: { project: (typeof projects)[0] }) {
+function ProjectCard({ project, index, isInView }: { project: (typeof projects)[0]; index: number; isInView: boolean }) {
   const level = levelConfig[project.level]
   const LevelIcon = level.icon
 
   return (
-    <motion.div variants={staggerChild}>
+    <div
+      style={{ animationDelay: `${index * 0.1}s` }}
+      className={isInView ? 'animate-[fadeInUp_0.6s_ease-out_forwards]' : 'opacity-0'}
+    >
       <Link to={`/projects/${project.slug}`}>
-        <motion.article
-          whileHover={{ y: -4 }}
-          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] }}
-          className="group bg-white rounded-xl border border-[#E5E0D5] p-6 transition-all duration-300 hover:shadow-lg hover:border-[#E88B2E]/50 h-full flex flex-col"
+        <article
+          className="group bg-white rounded-xl border border-[#E5E0D5] p-6 transition-all duration-300 hover:shadow-lg hover:border-[#E88B2E]/50 hover:-translate-y-1 h-full flex flex-col"
         >
           {/* Thumbnail */}
           <div className="mb-4 overflow-hidden rounded-lg">
@@ -454,15 +446,15 @@ function ProjectCard({ project }: { project: (typeof projects)[0] }) {
             <Target className="h-3 w-3" />
             {project.resumeValue}
           </div>
-        </motion.article>
+        </article>
       </Link>
-    </motion.div>
+    </div>
   )
 }
 
 // ── Section 3: Level Explanation ───────────────────────────────────
 function LevelExplanationSection() {
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
   const levels = [
@@ -487,41 +479,39 @@ function LevelExplanationSection() {
       description: '带有用户界面的完整网页项目，可部署到互联网。',
       icon: Globe,
     },
+    {
+      level: 3,
+      title: '进阶项目',
+      subtitle: '多模块工程',
+      description: '涉及多文件协作、工程化实践和异步编程等进阶技术。',
+      icon: Globe,
+    },
   ]
 
   return (
     <section className="bg-white py-20 border-y border-[#E5E0D5]">
       <div className="mx-auto max-w-7xl px-6">
-        <motion.div
+        <div
           ref={ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className={`text-center mb-12 ${isInView ? 'animate-[fadeInUp_0.6s_ease-out_forwards]' : 'opacity-0'}`}
         >
           <h2 className="font-display text-3xl md:text-4xl font-bold text-[#2A2A2A] mb-3">
-            三级难度，循序渐进
+            四级难度，循序渐进
           </h2>
           <p className="text-[#8A8A8A] text-base max-w-md mx-auto">
             从最简单到完整应用，每一步都有清晰的目标
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {levels.map((item, i) => {
             const level = levelConfig[item.level]
             const Icon = item.icon
             return (
-              <motion.div
+              <div
                 key={item.level}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{
-                  duration: 0.6,
-                  delay: i * 0.15,
-                  ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-                }}
-                className="text-center"
+                style={{ animationDelay: `${i * 0.15}s` }}
+                className={`text-center ${isInView ? 'animate-[fadeInUp_0.6s_ease-out_forwards]' : 'opacity-0'}`}
               >
                 <div
                   className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${level.gradient} text-white mb-5`}
@@ -539,7 +529,7 @@ function LevelExplanationSection() {
                 <p className="text-sm text-[#8A8A8A] leading-relaxed">
                   {item.description}
                 </p>
-              </motion.div>
+              </div>
             )
           })}
         </div>
@@ -550,7 +540,7 @@ function LevelExplanationSection() {
 
 // ── Section 4: Stats Banner ────────────────────────────────────────
 function StatsSection() {
-  const ref = useRef(null)
+  const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
   const stats = [
@@ -566,11 +556,8 @@ function StatsSection() {
       className="bg-gradient-to-r from-[#E88B2E] to-[#B55A00] py-16"
     >
       <div className="mx-auto max-w-7xl px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-10"
+        <div
+          className={`text-center mb-10 ${isInView ? 'animate-[fadeInUp_0.6s_ease-out_forwards]' : 'opacity-0'}`}
         >
           <h2 className="font-display text-2xl font-semibold text-white mb-2">
             每一步，都算数
@@ -578,20 +565,14 @@ function StatsSection() {
           <p className="text-white/70 text-sm">
             不需要先学完所有语法。选一个项目，跟着做，做着做着就会了。
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, i) => (
-            <motion.div
+            <div
               key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{
-                duration: 0.6,
-                delay: i * 0.1,
-                ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-              }}
-              className="text-center"
+              style={{ animationDelay: `${i * 0.1}s` }}
+              className={`text-center ${isInView ? 'animate-[fadeInUp_0.6s_ease-out_forwards]' : 'opacity-0'}`}
             >
               <div className="font-display text-4xl md:text-5xl font-bold text-white mb-1">
                 {stat.number === 0 ? (
@@ -601,7 +582,7 @@ function StatsSection() {
                 )}
               </div>
               <div className="text-white/70 text-sm">{stat.label}</div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -611,7 +592,7 @@ function StatsSection() {
 
 // ── Section 5: How to Use (3 Steps) ────────────────────────────────
 function HowToUseSection() {
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
   const steps = [
@@ -641,11 +622,8 @@ function HowToUseSection() {
   return (
     <section className="bg-[#F4EFE6] py-20">
       <div className="mx-auto max-w-7xl px-6" ref={ref}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-14"
+        <div
+          className={`text-center mb-14 ${isInView ? 'animate-[fadeInUp_0.6s_ease-out_forwards]' : 'opacity-0'}`}
         >
           <h2 className="font-display text-3xl md:text-4xl font-bold text-[#2A2A2A] mb-3">
             三步开始你的第一个项目
@@ -653,22 +631,16 @@ function HowToUseSection() {
           <p className="text-[#8A8A8A] text-base max-w-md mx-auto">
             简单清晰的流程，让你专注学习本身
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step, i) => {
             const Icon = step.icon
             return (
-              <motion.div
+              <div
                 key={step.number}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{
-                  duration: 0.6,
-                  delay: i * 0.15,
-                  ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-                }}
-                className="relative"
+                style={{ animationDelay: `${i * 0.15}s` }}
+                className={`relative ${isInView ? 'animate-[fadeInUp_0.6s_ease-out_forwards]' : 'opacity-0'}`}
               >
                 <div className="bg-white rounded-2xl border border-[#E5E0D5] p-8 text-center h-full transition-all duration-300 hover:shadow-lg hover:border-[#E88B2E]/30">
                   {/* Number Badge */}
@@ -695,7 +667,7 @@ function HowToUseSection() {
                 {i < steps.length - 1 && (
                   <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-px bg-gradient-to-r from-[#E5E0D5] to-transparent" />
                 )}
-              </motion.div>
+              </div>
             )
           })}
         </div>
@@ -706,16 +678,13 @@ function HowToUseSection() {
 
 // ── Section 6: CTA ─────────────────────────────────────────────────
 function CTASection() {
-  const ref = useRef(null)
+  const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
 
   return (
     <section ref={ref} className="bg-[#2A2A2A] py-20">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-        className="mx-auto max-w-3xl px-6 text-center"
+      <div
+        className={`mx-auto max-w-3xl px-6 text-center ${isInView ? 'animate-[fadeInUp_0.8s_ease-out_forwards]' : 'opacity-0'}`}
       >
         <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
           准备好开始了吗？
@@ -730,7 +699,7 @@ function CTASection() {
           立即浏览项目
           <ArrowRight className="h-5 w-5" />
         </Link>
-      </motion.div>
+      </div>
     </section>
   )
 }

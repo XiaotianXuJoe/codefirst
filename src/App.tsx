@@ -10,11 +10,11 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="projects" element={<Projects />} />
-        <Route path="projects/:slug" element={<ProjectDetail />} />
-        <Route path="learning-path" element={<LearningPath />} />
-        <Route path="about" element={<About />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/projects/:slug" element={<ProjectDetail />} />
+        <Route path="/learning-path" element={<LearningPath />} />
+        <Route path="/about" element={<About />} />
       </Route>
     </Routes>
   )

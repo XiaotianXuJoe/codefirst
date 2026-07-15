@@ -71,28 +71,28 @@ const allProjects = [
     level: 0,
     levelLabel: 'Level 0',
     levelColor: 'from-[#7BA37E] to-[#5C8A5F]',
-    time: '1-2\u5C0F\u65F6',
-    lines: '~60\u884C',
+    time: '1-2小时',
+    lines: '~60行',
     stack: ['Python'],
     stackColor: 'bg-[#FDF3E8] text-[#B55A00]',
-    description: '\u751F\u6210\u968F\u673A\u5F3A\u5BC6\u7801\uFF0C\u652F\u6301\u81EA\u5B9A\u4E49\u957F\u5EA6\u548C\u5B57\u7B26\u7C7B\u578B\uFF0C\u9644\u5E26\u5BC6\u7801\u5F3A\u5EA6\u68C0\u6D4B\u529F\u80FD\u3002',
-    resumeValue: 'Python\u57FA\u7840 \u00B7 \u5B57\u7B26\u4E32\u5904\u7406 \u00B7 \u7528\u6237\u4EA4\u4E92',
+    description: '生成随机强密码，支持自定义长度和字符类型，附带密码强度检测功能。',
+    resumeValue: 'Python基础 · 字符串处理 · 用户交互',
     image: '/project-password.jpg',
   },
   {
     id: 2,
     slug: 'weather-cli',
-    emoji: '\u{1F324}\uFE0F',
+    emoji: '\u{1F324}️',
     title: '命令行天气查询工具',
     level: 1,
     levelLabel: 'Level 1',
     levelColor: 'from-[#E88B2E] to-[#B55A00]',
-    time: '2-3\u5C0F\u65F6',
-    lines: '~80\u884C',
+    time: '2-3小时',
+    lines: '~80行',
     stack: ['Python', 'requests'],
     stackColor: 'bg-[#FDF3E8] text-[#B55A00]',
-    description: '\u8C03\u7528\u5929\u6C14API\u83B7\u53D6\u5B9E\u65F6\u6570\u636E\uFF0C\u652F\u6301\u6444\u6C0F/\u534E\u6C0F\u5207\u6362\uFF0C\u5E26\u9519\u8BEF\u5904\u7406\u3002',
-    resumeValue: 'API\u8C03\u7528 \u00B7 \u7B2C\u4E09\u65B9\u5E93 \u00B7 \u5F02\u5E38\u5904\u7406',
+    description: '调用天气API获取实时数据，支持摄氏/华氏切换，带错误处理。',
+    resumeValue: 'API调用 · 第三方库 · 异常处理',
     image: '/project-weather.jpg',
   },
   {
@@ -103,12 +103,12 @@ const allProjects = [
     level: 1,
     levelLabel: 'Level 1',
     levelColor: 'from-[#E88B2E] to-[#B55A00]',
-    time: '2-4\u5C0F\u65F6',
-    lines: '~100\u884C',
+    time: '2-4小时',
+    lines: '~100行',
     stack: ['Python', 'os/pathlib'],
     stackColor: 'bg-[#FDF3E8] text-[#B55A00]',
-    description: '\u6279\u91CF\u6DFB\u52A0\u524D\u7F00/\u540E\u7F00\u3001\u6309\u5E8F\u53F7\u91CD\u547D\u540D\u3001\u5B57\u7B26\u4E32\u66FF\u6362\uFF0C\u652F\u6301\u9884\u89C8\u6A21\u5F0F\u3002',
-    resumeValue: '\u6587\u4EF6\u64CD\u4F5C \u00B7 \u8DEF\u5F84\u5904\u7406 \u00B7 \u81EA\u52A8\u5316\u811A\u672C',
+    description: '批量添加前缀/后缀、按序号重命名、字符串替换，支持预览模式。',
+    resumeValue: '文件操作 · 路径处理 · 自动化脚本',
     image: '/project-rename.jpg',
   },
   {
@@ -119,28 +119,28 @@ const allProjects = [
     level: 2,
     levelLabel: 'Level 2',
     levelColor: 'from-[#C07BA0] to-[#9B5A7D]',
-    time: '3-5\u5C0F\u65F6',
-    lines: '~150\u884C',
+    time: '3-5小时',
+    lines: '~150行',
     stack: ['HTML', 'CSS', 'JavaScript'],
     stackColor: 'bg-[#FDF3E8] text-[#B55A00]',
-    description: '\u7EAF\u524D\u7AEF\u8C03\u7528GitHub API\uFF0C\u5C55\u793A\u7528\u6237\u8D44\u6599\u5361\u7247\uFF0C\u53EF\u90E8\u7F72\u5230GitHub Pages\u3002',
-    resumeValue: '\u524D\u7AEF\u5F00\u53D1 \u00B7 API\u96C6\u6210 \u00B7 \u54CD\u5E94\u5F0F\u5E03\u5C40',
+    description: '纯前端调用GitHub API，展示用户资料卡片，可部署到GitHub Pages。',
+    resumeValue: '前端开发 · API集成 · 响应式布局',
     image: '/project-github.jpg',
   },
   {
     id: 5,
     slug: 'todo-app',
-    emoji: '\u2705',
+    emoji: '✅',
     title: '待办事项管理网页',
     level: 2,
     levelLabel: 'Level 2',
     levelColor: 'from-[#C07BA0] to-[#9B5A7D]',
-    time: '4-6\u5C0F\u65F6',
-    lines: '~200\u884C',
+    time: '4-6小时',
+    lines: '~200行',
     stack: ['HTML', 'CSS', 'JavaScript'],
     stackColor: 'bg-[#FDF3E8] text-[#B55A00]',
-    description: '\u5B8C\u6574\u7684CRUD\u5F85\u529E\u5E94\u7528\uFF0C\u6570\u636E\u6301\u4E45\u5316\uFF0C\u652F\u6301\u7B5B\u9009\u67E5\u770B\uFF0C\u53EF\u90E8\u7F72\u4E0A\u7EBF\u3002',
-    resumeValue: 'CRUD\u5F00\u53D1 \u00B7 LocalStorage \u00B7 DOM\u64CD\u4F5C',
+    description: '完整的CRUD待办应用，数据持久化，支持筛选查看，可部署上线。',
+    resumeValue: 'CRUD开发 · LocalStorage · DOM操作',
     image: '/project-todo.jpg',
   },
 ]
@@ -149,17 +149,17 @@ const allProjects = [
 type SortOption = 'default' | 'difficulty-asc' | 'difficulty-desc' | 'time-asc'
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'default', label: '\u9ED8\u8BA4' },
-  { value: 'difficulty-asc', label: '\u96BE\u5EA6\u9012\u589E' },
-  { value: 'difficulty-desc', label: '\u96BE\u5EA6\u9012\u51CF' },
-  { value: 'time-asc', label: '\u65F6\u95F4\u7531\u77ED\u5230\u957F' },
+  { value: 'default', label: '默认' },
+  { value: 'difficulty-asc', label: '难度递增' },
+  { value: 'difficulty-desc', label: '难度递减' },
+  { value: 'time-asc', label: '时间由短到长' },
 ]
 
 // ── Level Filter Tabs ───────────────────────────────────────────────
 type LevelFilter = 'all' | 0 | 1 | 2
 
 const levelFilters: { value: LevelFilter; label: string; color: string }[] = [
-  { value: 'all', label: '\u5168\u90E8', color: 'from-[#E88B2E] to-[#B55A00]' },
+  { value: 'all', label: '全部', color: 'from-[#E88B2E] to-[#B55A00]' },
   { value: 0, label: 'Level 0', color: 'from-[#7BA37E] to-[#5C8A5F]' },
   { value: 1, label: 'Level 1', color: 'from-[#E88B2E] to-[#B55A00]' },
   { value: 2, label: 'Level 2', color: 'from-[#C07BA0] to-[#9B5A7D]' },
@@ -263,7 +263,7 @@ export default function Projects() {
 
   // ── Current sort label ──────────────────────────────────────────
   const currentSortLabel =
-    sortOptions.find((o) => o.value === activeSort)?.label || '\u9ED8\u8BA4'
+    sortOptions.find((o) => o.value === activeSort)?.label || '默认'
 
   return (
     <div className="min-h-screen bg-[#F4EFE6]">
@@ -286,7 +286,7 @@ export default function Projects() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8A8A8A]" />
               <input
                 type="text"
-                placeholder="\u641C\u7D22\u9879\u76EE\u540D\u79F0\u3001\u6280\u672F\u6808..."
+                placeholder="搜索项目名称、技术栈..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={
@@ -402,7 +402,7 @@ export default function Projects() {
                       ? 'bg-[#E88B2E] text-white'
                       : 'text-[#8A8A8A] hover:text-[#4A4A4A]')
                   }
-                  aria-label="\u7F51\u683C\u89C6\u56FE"
+                  aria-label="网格视图"
                 >
                   <LayoutGrid className="h-4 w-4" />
                 </button>
@@ -414,7 +414,7 @@ export default function Projects() {
                       ? 'bg-[#E88B2E] text-white'
                       : 'text-[#8A8A8A] hover:text-[#4A4A4A]')
                   }
-                  aria-label="\u5217\u8868\u89C6\u56FE"
+                  aria-label="列表视图"
                 >
                   <List className="h-4 w-4" />
                 </button>
@@ -432,7 +432,7 @@ export default function Projects() {
                     className="flex items-center gap-1 px-3 py-2 text-sm text-[#8A8A8A] hover:text-[#F27B4C] transition-colors duration-200"
                   >
                     <X className="h-3.5 w-3.5" />
-                    \u6E05\u9664\u7B5B\u9009
+                    清除筛选
                   </motion.button>
                 )}
               </AnimatePresence>
@@ -449,14 +449,14 @@ export default function Projects() {
             <p className="text-sm text-[#8A8A8A]">
               {filteredProjects.length > 0 ? (
                 <span>
-                  \u5171{' '}
+                  共{' '}
                   <span className="font-semibold text-[#2A2A2A]">
                     {filteredProjects.length}
                   </span>{' '}
-                  \u4E2A\u9879\u76EE
+                  个项目
                 </span>
               ) : (
-                '\u672A\u627E\u5230\u5339\u914D\u7684\u9879\u76EE'
+                '未找到匹配的项目'
               )}
             </p>
           </div>
@@ -501,10 +501,10 @@ function PageHeader() {
         >
           <nav className="flex items-center gap-2 text-xs text-[#8A8A8A]">
             <Link to="/" className="hover:text-[#E88B2E] transition-colors">
-              \u9996\u9875
+              首页
             </Link>
             <span>&gt;</span>
-            <span className="text-[#4A4A4A]">\u9879\u76EE\u5E93</span>
+            <span className="text-[#4A4A4A]">项目库</span>
           </nav>
         </motion.div>
 
@@ -515,7 +515,7 @@ function PageHeader() {
           transition={{ duration: 0.6, ease: easeOutExpo }}
           className="font-display text-3xl md:text-4xl font-bold text-[#2A2A2A] mb-3"
         >
-          \u9879\u76EE\u5E93
+          项目库
         </motion.h1>
 
         {/* Subtitle */}
@@ -525,7 +525,7 @@ function PageHeader() {
           transition={{ duration: 0.6, delay: 0.2, ease: easeOutExpo }}
           className="text-[#8A8A8A] text-base max-w-2xl leading-relaxed"
         >
-          \u6309\u4F60\u7684\u65F6\u95F4\u548C\u6C34\u5E73\uFF0C\u627E\u5230\u6700\u9002\u5408\u7684\u5B9E\u6218\u9879\u76EE\u3002\u6BCF\u4E2A\u9879\u76EE\u90FD\u80FD\u5728 2-6 \u5C0F\u65F6\u5185\u8DD1\u8D77\u6765\u3002
+          按你的时间和水平，找到最适合的实战项目。每个项目都能在 2-6 小时内跑起来。
         </motion.p>
       </div>
     </div>
@@ -728,7 +728,7 @@ function ProjectCardList({
                 {project.resumeValue}
               </div>
               <span className="inline-flex items-center gap-1 text-sm font-medium text-[#E88B2E] group-hover:underline">
-                \u67E5\u770B\u5B8C\u6574\u6307\u5357
+                查看完整指南
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </span>
             </div>
@@ -756,10 +756,10 @@ function EmptyState({ onClear }: { onClear: () => void }) {
         <SearchX className="h-12 w-12 text-[#8A8A8A] mb-4" />
       </motion.div>
       <h3 className="font-display text-xl font-semibold text-[#2A2A2A] mb-2">
-        \u6CA1\u6709\u627E\u5230\u5339\u914D\u7684\u9879\u76EE
+        没有找到匹配的项目
       </h3>
       <p className="text-sm text-[#8A8A8A] mb-6 max-w-md">
-        \u5C1D\u8BD5\u8C03\u6574\u7B5B\u9009\u6761\u4EF6\u6216\u641C\u7D22\u5173\u952E\u8BCD
+        尝试调整筛选条件或搜索关键词
       </p>
       <button
         onClick={onClear}
@@ -770,7 +770,7 @@ function EmptyState({ onClear }: { onClear: () => void }) {
         }
       >
         <X className="h-4 w-4" />
-        \u6E05\u9664\u6240\u6709\u7B5B\u9009
+        清除所有筛选
       </button>
     </motion.div>
   )

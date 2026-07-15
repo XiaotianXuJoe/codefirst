@@ -58,91 +58,91 @@ const paths: LearningPath[] = [
     id: 'python',
     icon: Globe,
     iconEmoji: '\u{1F40D}',
-    title: 'Python\u81EA\u52A8\u5316\u65B9\u5411',
+    title: 'Python自动化方向',
     color: 'text-[#7BA37E]',
     gradient: 'from-[#7BA37E] to-[#5C8A5F]',
     bgTint: 'bg-[#E8F0E9]',
     steps: [
       {
-        name: '\u5BC6\u7801\u751F\u6210\u5668',
+        name: '密码生成器',
         slug: 'password-generator',
         level: 0,
-        description: '\u638C\u63E1Python\u57FA\u7840\u8BED\u6CD5',
+        description: '掌握Python基础语法',
       },
       {
-        name: '\u5929\u6C14\u67E5\u8BE2\u5DE5\u5177',
+        name: '天气查询工具',
         slug: 'weather-cli',
         level: 1,
-        description: '\u5B66\u4F1A\u8C03\u7528API',
+        description: '学会调用API',
       },
       {
-        name: '\u6587\u4EF6\u6279\u91CF\u91CD\u547D\u540D',
+        name: '文件批量重命名',
         slug: 'file-renamer',
         level: 1,
-        description: '\u6587\u4EF6\u7CFB\u7EDF\u64CD\u4F5C',
+        description: '文件系统操作',
       },
     ],
-    nextSteps: '\u722C\u866B / \u6570\u636E\u5206\u6790 / \u81EA\u52A8\u5316\u529E\u516C',
+    nextSteps: '爬虫 / 数据分析 / 自动化办公',
   },
   {
     id: 'frontend',
     icon: Code2,
     iconEmoji: '\u{1F310}',
-    title: '\u524D\u7AEF\u5F00\u53D1\u65B9\u5411',
+    title: '前端开发方向',
     color: 'text-[#E88B2E]',
     gradient: 'from-[#E88B2E] to-[#B55A00]',
     bgTint: 'bg-[#FDF3E8]',
     steps: [
       {
-        name: 'GitHub\u7528\u6237\u8D44\u6599\u67E5\u8BE2\u7AD9',
+        name: 'GitHub用户资料查询站',
         slug: 'github-profile',
         level: 2,
-        description: 'HTML/CSS/JS\u57FA\u7840',
+        description: 'HTML/CSS/JS基础',
       },
       {
-        name: '\u5F85\u529E\u4E8B\u9879\u7BA1\u7406\u7F51\u9875',
+        name: '待办事项管理网页',
         slug: 'todo-app',
         level: 2,
         description: 'CRUD + LocalStorage',
       },
     ],
-    nextSteps: 'React/Vue\u6846\u67B6 / \u5168\u6808\u5E94\u7528',
+    nextSteps: 'React/Vue框架 / 全栈应用',
   },
   {
     id: 'fullstack',
     icon: Rocket,
     iconEmoji: '\u{1F680}',
-    title: '\u5168\u6808\u5DE5\u7A0B\u5E08\u65B9\u5411',
+    title: '全栈工程师方向',
     color: 'text-[#C07BA0]',
     gradient: 'from-[#C07BA0] to-[#9B5A7D]',
     bgTint: 'bg-[#F3E8F0]',
     steps: [
       {
-        name: '\u5BC6\u7801\u751F\u6210\u5668',
+        name: '密码生成器',
         slug: 'password-generator',
         level: 0,
-        description: '\u7F16\u7A0B\u57FA\u7840',
+        description: '编程基础',
       },
       {
-        name: '\u5929\u6C14\u67E5\u8BE2\u5DE5\u5177',
+        name: '天气查询工具',
         slug: 'weather-cli',
         level: 1,
-        description: 'API\u8C03\u7528',
+        description: 'API调用',
       },
       {
-        name: 'GitHub\u7528\u6237\u8D44\u6599\u67E5\u8BE2\u7AD9',
+        name: 'GitHub用户资料查询站',
         slug: 'github-profile',
         level: 2,
-        description: '\u524D\u7AEF\u5F00\u53D1',
+        description: '前端开发',
       },
       {
-        name: '\u5F85\u529E\u4E8B\u9879\u7BA1\u7406\u7F51\u9875',
+        name: '待办事项管理网页',
         slug: 'todo-app',
         level: 2,
-        description: '\u5B8C\u6574\u5E94\u7528',
+        description: '完整应用',
       },
     ],
-    nextSteps: '\u5B66\u4E60\u540E\u7AEF + \u6570\u636E\u5E93',
+    nextSteps: '学习后端 + 数据库',
   },
 ]
 
@@ -172,23 +172,23 @@ const levelConfig: Record<
 const milestones = [
   {
     level: 0,
-    title: '\u4EE3\u7801\u7247\u6BB5',
-    description: '\u80FD\u76F4\u63A5\u590D\u5236\u8FD0\u884C\u7684\u5C0F\u7A0B\u5E8F',
-    skills: ['Python\u57FA\u7840\u8BED\u6CD5', '\u53D8\u91CF', '\u51FD\u6570', '\u6A21\u5757\u5BFC\u5165'],
+    title: '代码片段',
+    description: '能直接复制运行的小程序',
+    skills: ['Python基础语法', '变量', '函数', '模块导入'],
     count: 1,
   },
   {
     level: 1,
-    title: '\u63A7\u5236\u53F0\u5E94\u7528',
-    description: '\u9700\u8981\u5B89\u88C5\u4F9D\u8D56\u7684\u5B8C\u6574\u5DE5\u5177',
-    skills: ['API\u8C03\u7528', '\u6587\u4EF6\u64CD\u4F5C', '\u9519\u8BEF\u5904\u7406', '\u547D\u4EE4\u884C\u4EA4\u4E92'],
+    title: '控制台应用',
+    description: '需要安装依赖的完整工具',
+    skills: ['API调用', '文件操作', '错误处理', '命令行交互'],
     count: 2,
   },
   {
     level: 2,
-    title: '\u6709\u754C\u9762\u5E94\u7528',
-    description: '\u80FD\u5728\u6D4F\u89C8\u5668\u91CC\u8FD0\u884C\u7684\u5B8C\u6574\u5E94\u7528',
-    skills: ['DOM\u64CD\u4F5C', '\u4E8B\u4EF6\u5904\u7406', '\u6570\u636E\u6301\u4E45\u5316', '\u54CD\u5E94\u5F0F\u5E03\u5C40'],
+    title: '有界面应用',
+    description: '能在浏览器里运行的完整应用',
+    skills: ['DOM操作', '事件处理', '数据持久化', '响应式布局'],
     count: 2,
   },
 ]
@@ -241,10 +241,10 @@ function HeroSection() {
           className="flex items-center justify-center gap-2 text-xs text-[#8A8A8A] mb-6"
         >
           <Link to="/" className="hover:text-[#E88B2E] transition-colors">
-            \u9996\u9875
+            首页
           </Link>
           <span>&gt;</span>
-          <span className="text-[#4A4A4A]">\u5B66\u4E60\u8DEF\u5F84</span>
+          <span className="text-[#4A4A4A]">学习路径</span>
         </motion.nav>
 
         {/* Title */}
@@ -254,7 +254,7 @@ function HeroSection() {
           transition={{ duration: 1, ease: easeOutExpo }}
           className="font-display text-4xl md:text-5xl lg:text-[56px] font-bold text-white leading-tight mb-4"
         >
-          \u4F60\u7684\u7F16\u7A0B\u5B66\u4E60\u8DEF\u7EBF\u56FE
+          你的编程学习路线图
         </motion.h1>
 
         {/* Subtitle */}
@@ -264,7 +264,7 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2, ease: easeOutExpo }}
           className="text-[#8A8A8A] text-base max-w-xl mx-auto leading-relaxed"
         >
-          \u4ECE\u7B2C\u4E00\u4E2AHello World\u5230\u7B2C\u4E00\u4E2A\u5B8C\u6574\u5E94\u7528\uFF0C\u8DDF\u7740\u8D70\u5C31\u5BF9\u4E86
+          从第一个Hello World到第一个完整应用，跟着走就对了
         </motion.p>
 
         {/* Path Selector Pills */}
@@ -314,10 +314,10 @@ function SkillTreeSection() {
           className="text-center mb-14"
         >
           <h2 className="font-display text-3xl md:text-4xl font-bold text-[#2A2A2A] mb-3">
-            \u6309\u65B9\u5411\u9009\u62E9\u5B66\u4E60\u8DEF\u5F84
+            按方向选择学习路径
           </h2>
           <p className="text-[#8A8A8A] text-base max-w-md mx-auto">
-            \u4E09\u6761\u4E13\u4E1A\u8DEF\u5F84\uFF0C\u5E2E\u4F60\u4ECE\u5165\u95E8\u5230\u5C31\u4E1A
+            三条专业路径，帮你从入门到就业
           </p>
         </motion.div>
 
@@ -358,7 +358,7 @@ function PathCard({ path }: { path: LearningPath }) {
               {path.title}
             </h3>
             <p className="text-xs text-[#8A8A8A]">
-              {path.steps.length}\u4E2A\u9879\u76EE
+              {path.steps.length}个项目
             </p>
           </div>
         </div>
@@ -429,7 +429,7 @@ function PathCard({ path }: { path: LearningPath }) {
           <div className="flex items-center gap-2 text-xs text-[#8A8A8A]">
             <ArrowRight className="h-3.5 w-3.5 text-[#E88B2E]" />
             <span>
-              <span className="font-medium">\u4E0B\u4E00\u6B65\uFF1A</span>
+              <span className="font-medium">下一步：</span>
               {path.nextSteps}
             </span>
           </div>
@@ -455,7 +455,7 @@ function MilestonesSection() {
           className="text-center mb-12"
         >
           <h2 className="font-display text-2xl font-semibold text-[#2A2A2A]">
-            \u6BCF\u4E2A Level \u610F\u5473\u7740\u4EC0\u4E48\uFF1F
+            每个 Level 意味着什么？
           </h2>
         </motion.div>
 
@@ -516,7 +516,7 @@ function MilestonesSection() {
                 {/* Project Count */}
                 <div className="mt-4 pt-4 border-t border-[#E5E0D5] text-center">
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#FDF3E8] text-[#B55A00] text-xs font-medium">
-                    {m.count}\u4E2A\u9879\u76EE
+                    {m.count}个项目
                   </span>
                 </div>
               </motion.div>
@@ -542,7 +542,7 @@ function CTASection() {
         className="mx-auto max-w-3xl px-6 text-center"
       >
         <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">
-          \u9009\u5B9A\u4F60\u7684\u8DEF\u5F84\uFF0C\u5F00\u59CB\u7B2C\u4E00\u4E2A\u9879\u76EE
+          选定你的路径，开始第一个项目
         </h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -550,7 +550,7 @@ function CTASection() {
           transition={{ duration: 0.6, delay: 0.2, ease: easeOutExpo }}
           className="text-[#8A8A8A] text-base mb-10 max-w-md mx-auto"
         >
-          \u4E0D\u9700\u8981\u7B49\u5B66\u5B8C\u6240\u6709\u4E1C\u897F\u624D\u5F00\u59CB\u3002\u9009\u4E00\u4E2A\u9879\u76EE\uFF0C\u73B0\u5728\u5C31\u5F00\u59CB\u505A\u3002
+          不需要等学完所有东西才开始。选一个项目，现在就开始做。
         </motion.p>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -566,7 +566,7 @@ function CTASection() {
               'transition-all duration-300 hover:shadow-xl hover:opacity-90'
             }
           >
-            \u6D4F\u89C8\u5168\u90E8\u9879\u76EE
+            浏览全部项目
             <ArrowRight className="h-5 w-5" />
           </Link>
         </motion.div>

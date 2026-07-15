@@ -1,5 +1,5 @@
-import { useRef } from 'react'
-import { Link } from 'react-router'
+import { useRef, useEffect } from 'react'
+import { Link, useLocation } from 'react-router'
 import { motion, useInView } from 'framer-motion'
 import {
   ArrowRight,
@@ -197,6 +197,23 @@ const milestones = [
 //  LEARNING PATH PAGE
 // ═══════════════════════════════════════════════════════════════════
 export default function LearningPath() {
+  const location = useLocation()
+
+  // Scroll to path card when URL hash matches
+  useEffect(() => {
+    const hash = location.hash
+    if (hash && hash.startsWith('#path-')) {
+      const pathId = hash.replace('#path-', '')
+      const element = document.getElementById(`path-${pathId}`)
+      if (element) {
+        // Delay to ensure DOM is fully rendered
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 300)
+      }
+    }
+  }, [location.hash])
+
   return (
     <div>
       {/* ═══════ Section 1: Hero ═══════ */}
@@ -279,18 +296,23 @@ function HeroSection() {
           className="mt-8 flex flex-wrap items-center justify-center gap-3"
         >
           {paths.map((path) => (
-            <a
+            <button
               key={path.id}
-              href={`#path-${path.id}`}
+              onClick={() => {
+                const element = document.getElementById(`path-${path.id}`)
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              }}
               className={
                 'inline-flex items-center gap-2 px-5 py-2.5 rounded-full ' +
-                'text-sm font-medium transition-all duration-300 ' +
+                'text-sm font-medium transition-all duration-300 cursor-pointer ' +
                 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
               }
             >
               <span>{path.iconEmoji}</span>
               {path.title}
-            </a>
+            </button>
           ))}
         </motion.div>
       </div>

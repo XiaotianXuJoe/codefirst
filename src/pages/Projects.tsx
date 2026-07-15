@@ -10,6 +10,7 @@ import {
   FileCode,
   Terminal,
   Globe,
+  Rocket,
   X,
   LayoutGrid,
   List,
@@ -58,6 +59,11 @@ const levelConfig: Record<
     gradient: 'from-[#C07BA0] to-[#9B5A7D]',
     text: '网页应用 — 涉及API与存储',
     icon: Globe,
+  },
+  3: {
+    gradient: 'from-[#4A90D9] to-[#2E5A8C]',
+    text: '进阶项目 — 多文件工程',
+    icon: Rocket,
   },
 }
 

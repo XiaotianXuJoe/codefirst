@@ -479,7 +479,8 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { q: '样式没生效', a: 'CSS文件路径错误或没被引入。检查<link>标签的href路径。' },
     ],
     githubProjects: [
-      { name: '本项目本身就是最好的起点', stars: '你的', description: '完成后可直接作为GitHub仓库展示' },
+      { name: 'bradtraversy/github-finder', stars: '~200', description: 'React 版本但核心逻辑相同：Fetch API 获取 GitHub 用户信息并展示' },
+      { name: 'himanshumoral/github-profile-search', stars: '~15', description: '纯前端实现，调用 GitHub API 展示用户资料卡片' },
     ],
     extensions: [
       { level: 1, text: '展示用户的最近仓库列表', skill: 'API嵌套调用' },
@@ -569,7 +570,8 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { q: '回车没反应', a: '事件监听没有正确绑定。检查addEventListener是否在DOM加载后执行。' },
     ],
     githubProjects: [
-      { name: '本项目完成后建议作为独立仓库维护', stars: '你的', description: '这是前端面试最常问的项目类型之一' },
+      { name: 'himanshumoral/vanilla-js-todo-app', stars: '~50', description: 'Clean 的 Vanilla JS 实现，LocalStorage 持久化，适合对照学习' },
+      { name: 'Chinchilla15/todo-list', stars: '~30', description: 'The Odin Project 作业，有项目分类、优先级、截止日期功能' },
     ],
     extensions: [
       { level: 1, text: '添加任务编辑功能（双击修改）', skill: '复杂DOM操作' },
@@ -700,7 +702,8 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { q: 'movies.csv为空或乱码', a: '写入时指定encoding=utf-8，并用newline=防止空行。' }
     ],
     githubProjects: [
-      { name: '你的第一个数据项目', stars: '你的', description: '完成后可直接作为GitHub仓库展示' }
+      { name: 'Nn1ght9z/douban-movie-scraper', stars: '~30', description: '爬取豆瓣 Top250 电影，BeautifulSoup + xlwt 导出 Excel，结构清晰' },
+      { name: 'stars1324/python-ai-spider', stars: '~15', description: '爬取豆瓣电影 + DeepSeek AI 解析，包含数据分析和可视化' },
     ],
     extensions: [
       { level: 1, text: '添加请求间隔防止被封IP', skill: 'time.sleep + 随机延迟' },
@@ -808,7 +811,8 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { q: '笔记列表不显示', a: '检查renderNoteList()是否被调用。确认notes数组非空。' }
     ],
     githubProjects: [
-      { name: '你的第一个React式应用', stars: '你的', description: '可作为组件化设计的入门参考' }
+      { name: 'mastercell85/markdown_playground', stars: '~40', description: '功能丰富的浏览器 Markdown 编辑器，Vanilla JS 实现，支持多标签页和主题' },
+      { name: 'apandey-dev/markdownStudio', stars: '~25', description: '实时 Markdown 编辑器，支持 PDF 导出和零后端 URL 分享' },
     ],
     extensions: [
       { level: 1, text: 'Dark Mode 切换', skill: 'CSS变量 + 主题切换' },
@@ -918,7 +922,8 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { q: '日志文件越来越大', a: '添加日志轮转功能，或定期清理旧日志。可用logging模块替代手写。' }
     ],
     githubProjects: [
-      { name: '你的第一个DevOps工具', stars: '你的', description: '可作为运维自动化的入门项目' }
+      { name: 'kulsum842/server-status-checker', stars: '~20', description: 'Python 服务器监控脚本，支持响应时间检测和 SMTP 邮件告警' },
+      { name: 'rosslh/uptime-checker', stars: '~50', description: 'CLI 工具检查 UptimeRobot 监控的网站状态，展示响应时间和可用率' },
     ],
     extensions: [
       { level: 1, text: '添加邮件告警通知', skill: 'smtplib邮件发送' },

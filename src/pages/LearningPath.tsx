@@ -10,6 +10,7 @@ import {
   FileCode,
   Terminal,
   Code2,
+  Brain,
 } from 'lucide-react'
 
 // ── Animation Constants ─────────────────────────────────────────────
@@ -37,7 +38,7 @@ const fadeUpChild = {
 interface PathStep {
   name: string
   slug: string
-  level: 0 | 1 | 2
+  level: 0 | 1 | 2 | 3
   description: string
 }
 
@@ -144,6 +145,42 @@ const paths: LearningPath[] = [
     ],
     nextSteps: '学习后端 + 数据库',
   },
+  {
+    id: 'ai',
+    icon: Brain,
+    iconEmoji: '\u{1F9E0}',
+    title: 'AI大模型与Agent开发方向',
+    color: 'text-[#4A90D9]',
+    gradient: 'from-[#4A90D9] to-[#2E5A8C]',
+    bgTint: 'bg-[#E3F0FC]',
+    steps: [
+      {
+        name: 'AI聊天助手',
+        slug: 'ai-chat',
+        level: 2,
+        description: '大模型API调用入门',
+      },
+      {
+        name: '带历史记忆的聊天机器人',
+        slug: 'chat-history',
+        level: 2,
+        description: '对话状态管理与持久化',
+      },
+      {
+        name: '多工具智能Agent',
+        slug: 'tool-agent',
+        level: 3,
+        description: 'Function Calling与工具注册',
+      },
+      {
+        name: 'RAG知识库问答系统',
+        slug: 'rag-kb',
+        level: 3,
+        description: 'Embedding+向量检索+增强生成',
+      },
+    ],
+    nextSteps: 'LangChain / 智能体框架 / 企业知识库',
+  },
 ]
 
 // ── Level Config ────────────────────────────────────────────────────
@@ -165,6 +202,11 @@ const levelConfig: Record<
     gradient: 'from-[#C07BA0] to-[#9B5A7D]',
     label: 'Level 2',
     icon: Code2,
+  },
+  3: {
+    gradient: 'from-[#4A90D9] to-[#2E5A8C]',
+    label: 'Level 3',
+    icon: Brain,
   },
 }
 
@@ -189,6 +231,13 @@ const milestones = [
     title: '有界面应用',
     description: '能在浏览器里运行的完整应用',
     skills: ['DOM操作', '事件处理', '数据持久化', '响应式布局'],
+    count: 4,
+  },
+  {
+    level: 3,
+    title: 'AI原生应用',
+    description: '基于大模型能力的智能应用',
+    skills: ['大模型API调用', '对话状态管理', 'Function Calling', 'RAG检索增强'],
     count: 2,
   },
 ]
@@ -339,7 +388,7 @@ function SkillTreeSection() {
             按方向选择学习路径
           </h2>
           <p className="text-[#8A8A8A] text-base max-w-md mx-auto">
-            三条专业路径，帮你从入门到就业
+            四条专业路径，帮你从入门到就业
           </p>
         </motion.div>
 
@@ -348,7 +397,7 @@ function SkillTreeSection() {
           variants={staggerContainer}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
         >
           {paths.map((path) => (
             <PathCard key={path.id} path={path} />

@@ -78,6 +78,23 @@ interface Extension {
   skill: string
 }
 
+interface ResumePoint {
+  title: string
+  content: string
+}
+
+interface InterviewFocus {
+  question: string
+  direction: string
+}
+
+interface ResumeSection {
+  projectName: string
+  points: ResumePoint[]
+  interviewFocus: InterviewFocus[]
+  preparation: string[]
+}
+
 interface ProjectDetailData {
   slug: string
   emoji: string
@@ -95,6 +112,7 @@ interface ProjectDetailData {
   image: string
   resumeText: string
   resumeTags: string[]
+  resumeSection: ResumeSection
   steps: Step[]
   keyConcepts: KeyConcept[]
   faq: FAQItem[]
@@ -126,6 +144,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '使用Python内置random/string模块实现强密码生成算法；支持自定义密码长度和字符类型（大写/小写/数字/符号）；实现密码强度评估功能，基于长度和字符多样性进行分级评分。',
     resumeTags: ['Python基础', '字符串处理', '用户交互设计'],
+    resumeSection: {
+      projectName: '个人密码生成器',
+      points: [
+        {
+          title: '项目概述',
+          content: '使用 Python 内置 random/string 库开发命令行密码生成工具，支持自定义长度、包含字符类型（大小写字母、数字、特殊符号），并提供密码强度评估功能。',
+        },
+        {
+          title: '核心功能实现',
+          content: '通过 random.choice() 实现密码随机生成，利用 string 模块预定义字符集，使用条件判断和循环控制密码复杂度，采用命令行交互获取用户输入。',
+        },
+        {
+          title: '技术亮点',
+          content: '纯标准库实现，无需第三方依赖；支持密码强度实时评估（弱/中/强）；可重复生成直到用户满意；代码简洁，适合作为 Python 入门项目展示基础语法掌握程度。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: 'random 模块的随机性如何保证安全性？',
+          direction: '区分 random 和 secrets 模块：random 是伪随机，不适合安全场景；secrets 使用系统熵源，适合密码生成。可回答如何改进为安全密码生成器。',
+        },
+        {
+          question: '密码强度评估的标准是什么？',
+          direction: '从长度、字符集多样性、熵值等角度回答。可扩展讨论 zxcvbn 等开源库的实现原理。',
+        },
+        {
+          question: '如果用户要求生成 1000 个不重复的密码，你会怎么优化？',
+          direction: '讨论集合去重、生成效率、内存占用，以及当密码空间不足时的处理策略。',
+        },
+      ],
+      preparation: [
+        '了解 random 与 secrets 模块的区别，能解释伪随机和真随机的应用场景',
+        '熟悉密码学基本概念：熵、字符集、密码空间',
+        '思考项目扩展方向：GUI界面、密码管理器、浏览器插件',
+        '准备展示代码中的异常处理（如用户输入非数字时的处理）',
+      ],
+    },
     steps: [
       {
         title: '导入模块，定义字符集合',
@@ -225,6 +280,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '调用wttr.in开放天气API，实现城市天气实时查询功能；使用requests库处理HTTP请求，实现网络异常捕获与重试机制；设计数据解析层，将API原始响应格式化为结构化天气信息。',
     resumeTags: ['REST API调用', 'HTTP协议基础', '数据解析'],
+    resumeSection: {
+      projectName: '命令行天气查询工具',
+      points: [
+        {
+          title: '项目概述',
+          content: '基于 Python requests 库调用第三方天气 API，实现命令行天气查询工具。支持城市名称输入、JSON 数据解析、格式化输出，并包含完整的异常处理机制。',
+        },
+        {
+          title: '核心功能实现',
+          content: '构造 HTTP GET 请求并添加 API Key 认证；解析 JSON 响应提取温度、湿度、天气状况等字段；使用 argparse 实现命令行参数解析；封装为模块化函数便于复用。',
+        },
+        {
+          title: '技术亮点',
+          content: '完整的 API 调用链路实践：请求构造 → 发送 → 响应处理 → 错误处理；理解 HTTP 状态码含义（200/401/404/429）；JSON 数据解析与格式化输出；环境变量管理 API Key。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: 'API Key 应该如何安全存储？',
+          direction: '强调环境变量方式，避免硬编码；提及 .env 文件和 .gitignore 配合；生产环境可使用密钥管理服务（AWS Secrets Manager / Vault）。',
+        },
+        {
+          question: '如果 API 响应超时或不可用，你的程序会怎么处理？',
+          direction: '讨论超时设置（requests timeout）、重试机制（指数退避）、降级策略（返回缓存数据或友好提示）。',
+        },
+        {
+          question: '如何处理 API 返回的大量数据，只提取需要的字段？',
+          direction: 'JSON 解析技巧：字典 get() 方法、嵌套字段安全访问、数据验证（schema validation）。',
+        },
+      ],
+      preparation: [
+        '理解 HTTP 协议基础：GET/POST、Headers、Status Code、JSON 格式',
+        '熟悉 requests 库的高级用法：timeout、重试、Session 复用',
+        '了解 RESTful API 设计原则和认证方式（API Key / OAuth / JWT）',
+        '思考如何扩展：多城市批量查询、历史数据存储、定时任务',
+      ],
+    },
     steps: [
       {
         title: '安装requests库',
@@ -327,6 +419,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '使用pathlib模块实现跨平台的文件批量重命名操作；支持前缀添加、序号格式化、字符串替换三种重命名模式；设计预览确认机制，防止误操作。',
     resumeTags: ['文件系统操作', '路径处理', '自动化脚本'],
+    resumeSection: {
+      projectName: '文件批量重命名工具',
+      points: [
+        {
+          title: '项目概述',
+          content: '使用 Python os/pathlib 模块开发文件批量重命名工具，支持按序号、日期、前缀/后缀等规则批量处理，提供预览模式避免误操作，具备撤销功能。',
+        },
+        {
+          title: '核心功能实现',
+          content: '使用 os.listdir() / Path.glob() 扫描目录；利用 os.rename() / Path.rename() 执行重命名；通过正则表达式提取和替换文件名中的特定模式；实现预览-确认-执行的安全操作流程。',
+        },
+        {
+          title: '技术亮点',
+          content: '文件系统操作的安全实践：预览模式防止误操作；撤销功能记录原始文件名；支持递归处理子目录；跨平台路径处理（pathlib 替代 os.path）。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: '如果重命名过程中途出错，如何保证数据不丢失？',
+          direction: '讨论原子操作、事务性处理、备份策略。可提及先复制再删除而非直接重命名，或维护操作日志支持回滚。',
+        },
+        {
+          question: 'os.path 和 pathlib 有什么区别？为什么推荐 pathlib？',
+          direction: 'pathlib 是面向对象的路径处理，支持链式调用，自动处理不同操作系统的路径分隔符，代码更简洁优雅。',
+        },
+        {
+          question: '处理上万个文件时，如何优化性能？',
+          direction: '讨论生成器替代列表（内存优化）、多线程/多进程并发、批量操作减少系统调用次数、进度条反馈用户体验。',
+        },
+      ],
+      preparation: [
+        '熟练掌握 os 和 pathlib 模块的文件/目录操作方法',
+        '理解 Python 的正则表达式（re 模块）在文本处理中的应用',
+        '了解文件系统的基本操作原理：原子性、锁、权限',
+        '思考扩展方向：GUI界面（tkinter/PyQt）、文件去重、批量格式转换',
+      ],
+    },
     steps: [
       {
         title: '列出文件夹中的文件',
@@ -427,6 +556,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '纯前端实现GitHub用户资料实时查询与展示，调用GitHub REST API获取公开数据；使用原生Fetch API配合async/await实现异步数据获取与错误处理；设计响应式卡片布局，适配桌面端和移动端浏览。',
     resumeTags: ['DOM操作', 'Fetch API', '异步编程', '响应式布局'],
+    resumeSection: {
+      projectName: 'GitHub 用户资料查询站',
+      points: [
+        {
+          title: '项目概述',
+          content: '纯前端实现 GitHub 用户资料查询页面，调用 GitHub REST API 获取用户公开信息，展示个人资料卡片、仓库列表、关注统计。使用原生 HTML/CSS/JavaScript 实现，无框架依赖。',
+        },
+        {
+          title: '核心功能实现',
+          content: '使用 Fetch API 发送异步 HTTP 请求；DOM 操作动态渲染用户资料和仓库列表；响应式 CSS 布局适配不同屏幕；GitHub API 速率限制处理和错误提示。',
+        },
+        {
+          title: '技术亮点',
+          content: '原生技术栈展示前端基础能力：理解 DOM 树结构、事件冒泡/捕获、CSS Flexbox/Grid 布局；异步编程实践（Promise/async-await）；REST API 数据绑定到视图层。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: 'Fetch API 和 XMLHttpRequest 有什么区别？',
+          direction: 'Fetch 基于 Promise，API 更现代简洁；XHR 兼容性好但回调地狱。Fetch 需要手动处理 HTTP 错误（!response.ok），XHR 自动抛错。',
+        },
+        {
+          question: 'GitHub API 有速率限制，你的页面怎么处理？',
+          direction: '讨论未认证请求限制（60次/小时），添加用户提示；缓存策略（localStorage 缓存结果）；错误状态码处理（403/404）。',
+        },
+        {
+          question: '如果 API 返回的数据量很大，如何优化页面渲染性能？',
+          direction: '虚拟列表（只渲染可见区域）、分页加载、骨架屏优化感知性能、防抖搜索减少请求次数。',
+        },
+      ],
+      preparation: [
+        '深入理解 DOM API：querySelector、createElement、appendChild、事件监听',
+        '掌握 CSS 布局：Flexbox、Grid、响应式媒体查询',
+        '理解 JavaScript 异步：Promise、async/await、事件循环',
+        '了解浏览器同源策略和 CORS，以及 JSONP/代理等跨域解决方案',
+      ],
+    },
     steps: [
       {
         title: 'HTML结构',
@@ -518,6 +684,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '实现完整的任务增删改查(CRUD)功能，支持任务完成状态切换与筛选查看；使用LocalStorage实现浏览器端数据持久化，刷新页面数据不丢失；设计渐变背景+卡片式布局，支持全部/进行中/已完成三种筛选视图。',
     resumeTags: ['DOM操作', '事件驱动编程', 'LocalStorage', 'CRUD设计'],
+    resumeSection: {
+      projectName: '待办事项管理网页',
+      points: [
+        {
+          title: '项目概述',
+          content: '使用原生 JavaScript 开发功能完整的 CRUD 待办应用，支持添加、编辑、删除、标记完成、筛选（全部/进行中/已完成）。数据持久化存储在浏览器 LocalStorage，刷新页面不丢失。',
+        },
+        {
+          title: '核心功能实现',
+          content: '事件委托处理动态元素点击；LocalStorage 实现数据持久化（JSON 序列化/反序列化）；DOM 操作实现增删改查的视图更新；CSS 过渡动画提升交互体验。',
+        },
+        {
+          title: '技术亮点',
+          content: '完整的 CRUD 应用架构：数据层（LocalStorage）→ 逻辑层（状态管理）→ 视图层（DOM渲染）；理解数据驱动视图的核心思想；模块化函数设计便于维护扩展。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: 'LocalStorage 有什么限制？如果数据量很大怎么办？',
+          direction: '5MB 存储限制、仅支持字符串、同步阻塞主线程。大数据量可改用 IndexedDB，或结合 Service Worker 做离线缓存。',
+        },
+        {
+          question: '如何防止 XSS 攻击？用户输入的内容直接插入 DOM 安全吗？',
+          direction: '必须使用 textContent 而非 innerHTML；对用户输入做转义处理；了解 XSS 攻击原理和防御手段（CSP、输入过滤、输出编码）。',
+        },
+        {
+          question: '如果要在多台设备间同步待办数据，你会怎么设计？',
+          direction: '引入后端和数据库（REST API + 数据库）；用户认证（JWT/Session）；实时同步（WebSocket / SSE）；冲突解决策略（最后写入优先 / CRDT）。',
+        },
+      ],
+      preparation: [
+        '深入理解浏览器存储：LocalStorage、SessionStorage、IndexedDB、Cookie 的区别和适用场景',
+        '掌握事件委托、事件冒泡/捕获机制',
+        '了解前端安全基础：XSS、CSRF 防御',
+        '思考扩展方向：React/Vue 重构、后端同步、拖拽排序、分类标签',
+      ],
+    },
     steps: [
       {
         title: 'HTML结构',
@@ -606,6 +809,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     image: '/project-movie.jpg',
     resumeText: '使用requests+BeautifulSoup实现豆瓣电影Top250数据抓取，pandas完成数据清洗与统计分析，matplotlib生成评分分布、Top10排名、年份趋势等多维可视化图表。输出结构化CSV数据集及分析报告。',
     resumeTags: ['网络爬虫', '数据分析', '数据可视化', 'pandas', 'matplotlib'],
+    resumeSection: {
+      projectName: '豆瓣电影数据抓取与分析',
+      points: [
+        {
+          title: '项目概述',
+          content: '使用 Python requests + BeautifulSoup 爬取豆瓣电影 Top250 数据，使用 pandas 进行数据清洗和统计分析，使用 matplotlib 生成评分分布、Top10 排名、年份趋势等多维可视化图表，输出结构化 CSV 数据集。',
+        },
+        {
+          title: '核心功能实现',
+          content: 'requests 发送 HTTP 请求并处理响应编码；BeautifulSoup 解析 HTML DOM 提取电影标题、评分、评价人数、导演等信息；分页爬取（10页×25条）并合并数据；pandas DataFrame 数据清洗（去重、类型转换、缺失值处理）；matplotlib 多子图可视化。',
+        },
+        {
+          title: '技术亮点',
+          content: '完整的爬虫工程实践：请求伪装（User-Agent/Headers）、请求间隔控制（防封策略）、防御性解析（处理缺失字段避免 AttributeError）；数据分析 Pipeline：原始数据 → 清洗 → 分析 → 可视化 → 报告。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: '爬虫被封 IP 了怎么办？有哪些反反爬策略？',
+          direction: '请求间隔（time.sleep + random）、User-Agent 轮换、代理 IP 池、Cookie/Session 维持、分布式爬取。强调遵守 robots.txt 和网站服务条款。',
+        },
+        {
+          question: 'BeautifulSoup 和 XPath/lxml 有什么区别？',
+          direction: 'BeautifulSoup 更灵活容错（标签不闭合也能解析），适合快速开发；lxml 基于 C 更快，XPath 表达能力强。Scrapy 框架内置 XPath/CSS Selector。',
+        },
+        {
+          question: '如果网站改用 JavaScript 动态加载数据，你的爬虫还适用吗？',
+          direction: '静态 HTML 爬虫失效，需要使用 Selenium/Playwright 模拟浏览器、或分析 API 接口直接请求 JSON 数据。对比不同方案的优缺点。',
+        },
+      ],
+      preparation: [
+        '理解 HTTP 协议细节：Headers、Cookie、Session、编码（UTF-8/GBK）',
+        '熟悉 pandas 核心操作：DataFrame、groupby、merge、pivot_table',
+        '掌握 matplotlib/seaborn 可视化：折线图、柱状图、饼图、热力图',
+        '了解爬虫法律边界：robots.txt、频率控制、数据用途合规',
+      ],
+    },
     fileStructure: [
       { name: 'movie-scraper', type: 'folder', description: '项目根文件夹', required: true, children: [
         { name: 'scraper.py', type: 'file-core', description: '爬取逻辑：HTTP请求+HTML解析', analogy: '情报收集员，负责从网页中提取信息', required: true },
@@ -730,6 +970,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     image: '/project-notes.jpg',
     resumeText: '独立开发Markdown笔记Web应用，实现CRUD操作、左右分栏实时预览、标签分类、全文搜索等功能。使用marked.js实现Markdown渲染，LocalStorage实现数据持久化，模块化组件设计。',
     resumeTags: ['React式组件设计', '状态管理', 'Markdown渲染', 'LocalStorage'],
+    resumeSection: {
+      projectName: 'Markdown 笔记 Web 应用',
+      points: [
+        {
+          title: '项目概述',
+          content: '独立开发功能完整的 Markdown 笔记 Web 应用，实现 CRUD 操作、左右分栏实时预览、标签分类、全文搜索。使用 marked.js 实现 Markdown 渲染，LocalStorage 实现数据持久化，采用模块化组件设计。',
+        },
+        {
+          title: '核心功能实现',
+          content: 'marked.js 库解析 Markdown 语法为 HTML；左右分栏实时预览（输入即时渲染）；标签系统（多标签筛选、标签云）；全文搜索（标题+内容关键词匹配）；本地存储自动保存和读取。',
+        },
+        {
+          title: '技术亮点',
+          content: '前端组件化设计思想：将编辑器、预览区、侧边栏、搜索框封装为独立模块；状态管理实践（笔记列表、当前笔记、筛选条件的状态同步）；理解数据驱动视图的核心架构。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: '如何实现左右分栏的实时同步滚动？',
+          direction: '计算编辑区和预览区的滚动比例映射，监听 scroll 事件同步滚动位置。或基于行号映射，将 Markdown 行号与渲染后的 DOM 元素位置关联。',
+        },
+        {
+          question: 'marked.js 渲染的 HTML 可能存在 XSS 风险，如何处理？',
+          direction: '开启 marked 的 sanitize 选项（或使用 DOMPurify）；只渲染白名单标签；对用户输入做过滤转义。',
+        },
+        {
+          question: '如果笔记数量达到上千条，LocalStorage 性能会下降吗？',
+          direction: 'LocalStorage 是同步 API，大数据量会阻塞主线程。优化方案：按需加载（分页）、IndexedDB 替代、Service Worker 后台同步、笔记压缩存储。',
+        },
+      ],
+      preparation: [
+        '深入理解前端组件化设计模式：MVC / MVVM 的区别',
+        '了解 Markdown 语法规范和渲染原理（lexer → parser → renderer）',
+        '掌握浏览器存储的性能特征和容量限制',
+        '思考扩展方向：后端同步、多人协作（CRDT）、云端存储、导出 PDF',
+      ],
+    },
     fileStructure: [
       { name: 'markdown-notes', type: 'folder', description: '项目根文件夹', required: true, children: [
         { name: 'index.html', type: 'file-core', description: '网页入口', analogy: '房屋大门', required: true },
@@ -839,6 +1116,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     image: '/project-monitor.jpg',
     resumeText: '开发异步网站状态监控工具，使用asyncio实现并发HTTP检测，JSON配置文件驱动，支持响应时间测量与彩色状态报告。可配置监控目标、检查频率与超时阈值，适用于小型服务的可用性监控。',
     resumeTags: ['异步编程', 'DevOps', '配置驱动', '并发检测'],
+    resumeSection: {
+      projectName: '网站状态监控工具',
+      points: [
+        {
+          title: '项目概述',
+          content: '开发异步网站状态监控工具，使用 asyncio + aiohttp 实现并发 HTTP 检测，JSON 配置文件驱动监控目标，支持响应时间测量与彩色状态报告。可配置监控目标、检查频率与超时阈值，适用于小型服务的可用性监控。',
+        },
+        {
+          title: '核心功能实现',
+          content: 'asyncio 异步并发同时检测多个网站；aiohttp 发送 HTTP 请求并测量响应时间；JSON 配置文件解析监控目标列表；定时任务调度（asyncio.sleep 循环）；彩色终端输出（ANSI 颜色码）。',
+        },
+        {
+          title: '技术亮点',
+          content: '异步编程实践：理解协程、事件循环、并发与并行的区别；配置驱动设计（JSON 配置无需改代码即可增减监控目标）；可扩展的监控指标（状态码、响应时间、SSL 证书过期）。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: 'asyncio 和 threading/multiprocessing 有什么区别？',
+          direction: 'asyncio 是单线程协程，适合 IO 密集型（网络请求）；threading 是多线程，受 GIL 限制不适合 CPU 密集型；multiprocessing 是真并行，适合 CPU 密集型。监控工具是 IO 密集型，asyncio 最优。',
+        },
+        {
+          question: '如果监控 1000 个网站，asyncio 的并发量有限制吗？',
+          direction: '讨论连接池限制（aiohttp.TCPConnector 限制连接数）、文件描述符上限（ulimit）、内存占用。可使用信号量（asyncio.Semaphore）控制并发数。',
+        },
+        {
+          question: '如何实现告警通知（邮件/钉钉/企业微信）？',
+          direction: '监控异常时触发告警通道：smtplib 发送邮件、webhook 调用钉钉/企业微信机器人、集成第三方告警平台（PagerDuty）。讨论告警降噪（避免频繁告警）。',
+        },
+      ],
+      preparation: [
+        '深入理解 Python asyncio：事件循环、协程、Task、Future、await/async',
+        '了解 aiohttp 的高级用法：连接池、超时控制、重试策略',
+        '熟悉 JSON/YAML 配置文件解析和验证（jsonschema）',
+        '思考扩展方向：Web 仪表盘、历史数据存储（时序数据库）、告警通知集成',
+      ],
+    },
     fileStructure: [
       { name: 'site-monitor', type: 'folder', description: '项目根文件夹', required: true, children: [
         { name: 'monitor.py', type: 'file-core', description: '核心监控逻辑：异步HTTP检查', analogy: '检测员，实际执行检查任务的人', required: true },
@@ -953,6 +1267,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '基于 DeepSeek API 开发命令行 AI 对话助手，实现 HTTP 请求构造、JSON 响应解析、API 异常处理（401/超时/网络错误），理解 temperature 等核心参数对生成效果的影响。',
     resumeTags: ['大模型 API 调用', 'Prompt 设计', '异常处理'],
+    resumeSection: {
+      projectName: 'AI 聊天助手',
+      points: [
+        {
+          title: '项目概述',
+          content: '基于 DeepSeek API 开发命令行 AI 对话助手，实现 HTTP 请求构造、JSON 响应解析、API 异常处理（401/超时/网络错误）。理解 temperature、role 等核心参数对生成效果的影响，掌握大模型 API 的标准调用范式。',
+        },
+        {
+          title: '核心功能实现',
+          content: '使用 requests 库发送 POST 请求到 DeepSeek API，构造包含 model、messages、temperature 的请求体；解析响应 JSON 提取 AI 回复内容；处理常见异常（401 认证失败、超时、网络错误）；实现命令行交互循环。',
+        },
+        {
+          title: '技术亮点',
+          content: '完整的大模型 API 调用链路实践：理解 REST API 请求结构、HTTP Headers（Authorization Bearer Token）、请求体格式（OpenAI 兼容格式）；异常处理覆盖网络层、HTTP 层、应用层错误；环境变量管理 API Key。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: 'temperature 参数是什么？如何根据场景调整？',
+          direction: 'temperature 控制采样随机性（0-2）。低 temperature（0.1-0.3）适合代码生成、分类等确定性任务；高 temperature（0.7-1.0）适合创意写作、头脑风暴。理解背后的 softmax 采样原理。',
+        },
+        {
+          question: 'API Key 泄露了怎么办？如何安全存储？',
+          direction: '立即在平台撤销并重新生成；使用环境变量而非硬编码；.env 文件加入 .gitignore；生产环境使用密钥管理服务（KMS/Vault）；前端代码绝不应包含 API Key。',
+        },
+        {
+          question: '如果 API 响应很慢，用户体验怎么优化？',
+          direction: '流式输出（SSE/streaming）让用户看到逐字生成效果；添加打字机动画提升感知体验；超时设置和重试机制；Loading 状态提示。',
+        },
+      ],
+      preparation: [
+        '理解大模型 API 的核心概念：token、context window、temperature、top_p、role',
+        '熟悉 OpenAI/DeepSeek API 的请求/响应格式和错误码',
+        '了解 Prompt Engineering 基础：zero-shot、few-shot、Chain-of-Thought',
+        '思考扩展方向：多轮对话、流式输出、对话历史、系统提示词定制',
+      ],
+    },
     fileStructure: [
       { name: 'ai-chat', type: 'folder', description: '项目根文件夹', required: true, children: [
         { name: 'chat.py', type: 'file-core', description: '核心对话逻辑：构造请求、调用 API、处理异常', analogy: '就像餐厅的服务员，负责把客人的需求传达给后厨', required: true },
@@ -1053,6 +1404,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '开发带历史记忆的 AI 聊天机器人，支持多会话管理、系统提示词定制、JSON 本地持久化。实现对话状态维护、上下文窗口管理、多角色消息格式。',
     resumeTags: ['对话状态管理', '数据持久化', '系统提示词'],
+    resumeSection: {
+      projectName: '带历史记忆的聊天机器人',
+      points: [
+        {
+          title: '项目概述',
+          content: '开发带历史记忆的 AI 聊天机器人，支持多会话管理、系统提示词定制、JSON 本地持久化。实现对话状态维护、上下文窗口管理、多角色消息格式（system/user/assistant），可切换不同 AI 人格。',
+        },
+        {
+          title: '核心功能实现',
+          content: '使用 dict 结构维护多个独立 session，每个 session 包含 messages 列表；system role 设定 AI 人格和行为；JSON 文件读写实现对话历史持久化；提供 /new /list /switch /system /personality /clear 等完整命令集。',
+        },
+        {
+          title: '技术亮点',
+          content: '对话系统的核心架构设计：会话层（多 session 管理）→ 消息层（role/content 格式）→ 持久层（JSON 序列化）；上下文窗口意识：理解 token 消耗与历史长度的关系；系统提示词工程：通过 system role 塑造 AI 行为。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: '上下文窗口满了怎么办？如何管理对话历史？',
+          direction: '讨论滑动窗口（保留最近 N 轮）、摘要压缩（将早期对话总结为 system prompt）、token 计数（tiktoken 估算）、超出限制时的优雅降级策略。',
+        },
+        {
+          question: 'system prompt 和 user prompt 有什么区别？',
+          direction: 'system 是全局指令（设定人格、规则），user 是具体请求。system 优先级更高，影响整个对话。可讨论 system prompt 注入攻击和防御。',
+        },
+        {
+          question: '如果对话历史很大，JSON 文件读写性能会下降吗？',
+          direction: 'JSON 文件随时间增大，读写变慢。优化方案：按 session 分文件存储、数据库替代（SQLite）、增量写入、压缩存储、定期归档。',
+        },
+      ],
+      preparation: [
+        '深入理解大模型对话格式：system / user / assistant / tool 角色的作用和区别',
+        '了解 token 计数方法和上下文窗口限制（不同模型的限制不同）',
+        '掌握对话管理策略：滑动窗口、摘要压缩、RAG 增强',
+        '思考扩展方向：Web 界面、云端同步、语音输入、导出分享',
+      ],
+    },
     fileStructure: [
       { name: 'chat-history', type: 'folder', description: '项目根文件夹', required: true, children: [
         { name: 'chat.py', type: 'file-core', description: '核心逻辑：API调用、会话管理、交互界面', analogy: '就像餐厅的全套服务系统', required: true },
@@ -1153,6 +1541,43 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '开发多工具智能 Agent，实现 Function Calling 能力。大模型根据用户问题自动判断调用天气查询、数学计算、时间获取等工具，执行后将结果回传给模型生成最终回答。',
     resumeTags: ['Function Calling', '工具注册', '意图路由'],
+    resumeSection: {
+      projectName: '多工具智能 Agent',
+      points: [
+        {
+          title: '项目概述',
+          content: '开发多工具智能 Agent，实现 Function Calling 能力。大模型根据用户问题自动判断调用天气查询、数学计算、时间获取等工具，执行后将结果回传给模型生成最终回答。理解 Agent 的核心架构：意图识别 → 工具调用 → 结果回传 → 回答生成。',
+        },
+        {
+          title: '核心功能实现',
+          content: 'TOOLS 字典注册多个工具（function + description + parameters）；build_tool_prompt() 构造工具描述让模型理解可用工具；parse_tool_call() 解析模型返回的工具调用指令；execute_tool() 执行对应函数并返回结果；两次 API 调用模式（判断工具 → 执行 → 生成回答）。',
+        },
+        {
+          title: '技术亮点',
+          content: 'Function Calling 的完整链路实践：工具注册 → 意图路由 → 参数解析 → 执行 → 结果回传；理解大模型如何基于工具描述做出决策；可扩展的工具注册架构（新增工具零耦合）。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: '大模型怎么知道要调用哪个工具？',
+          direction: '模型基于工具 description 和参数定义做语义匹配。清晰的描述至关重要。可讨论 ReAct 模式（Reasoning + Acting）：模型先思考再行动。',
+        },
+        {
+          question: '如果工具执行失败，怎么处理？',
+          direction: '错误信息回传给模型，让模型决定重试、换工具、或告知用户。讨论容错设计：超时处理、降级策略、错误日志记录。',
+        },
+        {
+          question: 'ReAct、Plan-and-Execute、Function Calling 有什么区别？',
+          direction: 'ReAct：思考-行动-观察循环；Plan-and-Execute：先规划步骤再执行；Function Calling：模型直接输出结构化工具调用。三者可结合使用，适应不同复杂度场景。',
+        },
+      ],
+      preparation: [
+        '深入理解 Function Calling 原理：模型输出结构化 JSON 而非自然语言',
+        '了解主流 Agent 框架：LangChain、AutoGPT、MetaGPT 的架构差异',
+        '掌握工具描述优化技巧：清晰的 description 和参数定义直接影响模型决策准确率',
+        '思考扩展方向：多工具链式调用、人机协作确认、工具执行沙箱安全',
+      ],
+    },
     fileStructure: [
       { name: 'tool-agent', type: 'folder', description: '项目根文件夹', required: true, children: [
         { name: 'agent.py', type: 'file-core', description: '核心逻辑：工具注册、意图路由、结果回传', analogy: '就像餐厅的智能调度系统', required: true },
@@ -1253,6 +1678,47 @@ const projectDetails: Record<string, ProjectDetailData> = {
     resumeText:
       '开发 RAG 知识库问答系统，实现文档上传、文本切分、Embedding 向量化、ChromaDB 向量检索、检索增强生成完整流程。支持批量上传、多文档管理、问答交互。',
     resumeTags: ['Embedding', '向量检索', '检索增强生成', 'ChromaDB'],
+    resumeSection: {
+      projectName: 'RAG 知识库问答系统',
+      points: [
+        {
+          title: '项目概述',
+          content: '开发 RAG（检索增强生成）知识库问答系统，实现文档上传、文本切分、Embedding 向量化、ChromaDB 向量检索、检索增强生成完整流程。支持批量上传、多文档管理、问答交互。使用 DeepSeek API 进行对话生成，SiliconFlow API 进行文本 Embedding。',
+        },
+        {
+          title: '核心功能实现',
+          content: '文本切分策略（chunk_size + overlap 保证上下文完整）；调用 Embedding API 将文本转为高维向量；ChromaDB 向量数据库存储和检索；余弦相似度计算找到最相关文档片段；将检索结果作为上下文填入 Prompt，大模型生成精准回答。',
+        },
+        {
+          title: '技术亮点',
+          content: '完整的 RAG Pipeline 实践：文档 → 切分 → Embedding → 存储 → 检索 → 增强生成；理解 Embedding 的语义相似性原理；向量检索的 top-k 策略；检索结果与 Prompt 的工程化拼接；混合 API 架构（DeepSeek 对话 + SiliconFlow Embedding）。',
+        },
+      ],
+      interviewFocus: [
+        {
+          question: 'Embedding 是什么？为什么语义相似的文本向量距离近？',
+          direction: 'Embedding 将文本映射到高维语义空间（通常 512-4096 维），通过神经网络训练使语义相似的文本在向量空间中距离近。使用余弦相似度或欧氏距离衡量相似性。',
+        },
+        {
+          question: 'Chunk 切分的大小和重叠率怎么选择？',
+          direction: 'chunk_size 太小会丢失上下文，太大会降低检索精度；overlap 保证边界信息不丢失。需根据文档类型（代码/论文/对话）调整，可实验对比不同参数的效果。',
+        },
+        {
+          question: 'RAG 和微调（Fine-tuning）有什么区别？什么时候用 RAG？',
+          direction: 'RAG：动态检索外部知识，适合频繁更新的知识库，无需训练；微调：修改模型参数，适合固定领域知识、特定风格。两者可结合：RAG 提供上下文 + 微调模型理解领域术语。',
+        },
+        {
+          question: '检索到的内容不相关怎么办？如何提升检索精度？',
+          direction: '优化方向：query 改写/扩展、重排序（Rerank）模型、混合检索（向量+关键词）、调整 chunk 策略、添加元数据过滤。讨论 RAG 评估指标：Recall@K、MRR、NDCG。',
+        },
+      ],
+      preparation: [
+        '深入理解 Embedding 原理：神经网络编码器、向量空间、相似度度量',
+        '掌握向量数据库核心概念：索引算法（HNSW/IVF）、距离度量、维度灾难',
+        '了解 RAG 进阶技术：重排序、查询改写、混合检索、多路召回',
+        '思考扩展方向：多模态 RAG（图片/音频）、Agentic RAG（自主决策检索策略）、生产级部署（缓存、监控、评估）',
+      ],
+    },
     fileStructure: [
       { name: 'rag-kb', type: 'folder', description: '项目根文件夹', required: true, children: [
         { name: 'rag.py', type: 'file-core', description: '核心逻辑：向量库、文档处理、RAG问答', analogy: '就像图书馆的智能查询系统', required: true },
@@ -1364,7 +1830,14 @@ export default function ProjectDetail() {
 
   const copyResume = useCallback(() => {
     if (!project) return
-    navigator.clipboard.writeText(project.resumeText)
+    const section = project.resumeSection
+    const fullText = `${section.projectName}\n\n` +
+      section.points.map(p => `【${p.title}】\n${p.content}`).join('\n\n') +
+      '\n\n【面试官可能深挖的问题】\n' +
+      section.interviewFocus.map((f, i) => `${i + 1}. ${f.question}\n   准备方向：${f.direction}`).join('\n\n') +
+      '\n\n【准备方向】\n' +
+      section.preparation.map((p, i) => `${i + 1}. ${p}`).join('\n')
+    navigator.clipboard.writeText(fullText)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [project])
@@ -2140,6 +2613,121 @@ export default function ProjectDetail() {
                 <>
                   <Copy className="mr-2 h-4 w-4" />
                   复制到剪贴板
+                </>
+              )}
+            </button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Resume Project Description Section ── */}
+      <section className="py-8">
+        <div className="mx-auto max-w-4xl px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="rounded-xl bg-white border border-[#E5E0D5] p-6 shadow-sm"
+          >
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#C07BA0] to-[#9B5A7D] flex items-center justify-center text-white">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="font-display text-xl font-bold text-[#2A2A2A]">
+                  简历项目描述
+                </h2>
+                <p className="text-xs text-[#8A8A8A]">
+                  可直接复制到简历，含面试深挖与准备方向
+                </p>
+              </div>
+            </div>
+
+            {/* Project Name */}
+            <div className="rounded-lg bg-gradient-to-r from-[#F3E8F0] to-[#E8D5E0] p-4 mb-5">
+              <h3 className="font-display text-lg font-semibold text-[#2A2A2A]">
+                {project.resumeSection.projectName}
+              </h3>
+            </div>
+
+            {/* Points */}
+            <div className="space-y-4 mb-6">
+              {project.resumeSection.points.map((point, i) => (
+                <motion.div
+                  key={point.title}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.4 }}
+                  className="rounded-lg border border-[#E5E0D5] p-4"
+                >
+                  <h4 className="text-sm font-semibold text-[#2A2A2A] mb-2 flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-r from-[#C07BA0] to-[#9B5A7D] text-white text-xs font-bold">
+                      {i + 1}
+                    </span>
+                    {point.title}
+                  </h4>
+                  <p className="text-sm text-[#4A4A4A] leading-relaxed pl-7">
+                    {point.content}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Interview Focus */}
+            <div className="rounded-lg bg-[#FDF3E8] border border-[#E5D5C0] p-5 mb-5">
+              <h4 className="text-sm font-semibold text-[#B55A00] mb-3 flex items-center gap-2">
+                <Lightbulb className="h-4 w-4" />
+                面试官可能深挖的问题
+              </h4>
+              <div className="space-y-3">
+                {project.resumeSection.interviewFocus.map((focus, i) => (
+                  <div key={i} className="rounded-lg bg-white border border-[#E5E0D5] p-3">
+                    <p className="text-sm font-medium text-[#2A2A2A] mb-1">
+                      Q{i + 1}. {focus.question}
+                    </p>
+                    <p className="text-xs text-[#8A8A8A] leading-relaxed">
+                      <span className="font-medium text-[#B55A00]">准备方向：</span>
+                      {focus.direction}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Preparation */}
+            <div className="rounded-lg bg-[#E3F0FC] border border-[#C0D5E8] p-5 mb-5">
+              <h4 className="text-sm font-semibold text-[#2E5A8C] mb-3 flex items-center gap-2">
+                <Check className="h-4 w-4" />
+                准备方向
+              </h4>
+              <ul className="space-y-2">
+                {project.resumeSection.preparation.map((prep, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-[#4A4A4A]">
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gradient-to-r from-[#4A90D9] to-[#2E5A8C] text-white text-xs font-bold flex-shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    <span className="leading-relaxed">{prep}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Copy Button */}
+            <button
+              onClick={copyResume}
+              className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-[#E88B2E] to-[#B55A00] transition-all duration-300 hover:shadow-lg"
+            >
+              {copied ? (
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  已复制完整描述
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  复制完整简历描述
                 </>
               )}
             </button>

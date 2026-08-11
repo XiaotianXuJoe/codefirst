@@ -933,6 +933,407 @@ const projectDetails: Record<string, ProjectDetailData> = {
       { level: 4, text: 'Web管理界面（Flask）', skill: 'Web框架入门' }
     ]
   },
+  'ai-chat': {
+    slug: 'ai-chat',
+    emoji: '🤖',
+    title: 'AI 聊天助手',
+    level: 2,
+    levelLabel: 'Level 2',
+    levelColor: 'from-[#C07BA0] to-[#9B5A7D]',
+    time: '1-2小时',
+    lines: '~90行',
+    stack: ['Python', 'requests库', 'DeepSeek API'],
+    stackColor: 'bg-[#FDF3E8] text-[#B55A00]',
+    prerequisites: ['Python基础', '函数定义', '环境变量'],
+    description:
+      '调用 DeepSeek API 实现命令行 AI 对话。理解大模型 API 的基本调用方式：构造请求体、发送 HTTP POST、解析 JSON 响应。',
+    whyThisProject:
+      '大模型时代最基础的技能。学会调用 API 后，你可以将 AI 能力集成到任何项目中。本项目让你理解 temperature、role 等核心参数的含义。',
+    image: '/project-ai-chat.jpg',
+    resumeText:
+      '基于 DeepSeek API 开发命令行 AI 对话助手，实现 HTTP 请求构造、JSON 响应解析、API 异常处理（401/超时/网络错误），理解 temperature 等核心参数对生成效果的影响。',
+    resumeTags: ['大模型 API 调用', 'Prompt 设计', '异常处理'],
+    fileStructure: [
+      { name: 'ai-chat', type: 'folder', description: '项目根文件夹', required: true, children: [
+        { name: 'chat.py', type: 'file-core', description: '核心对话逻辑：构造请求、调用 API、处理异常', analogy: '就像餐厅的服务员，负责把客人的需求传达给后厨', required: true },
+        { name: '.env.example', type: 'file-config', description: '环境变量模板，告诉用户需要填什么', analogy: '就像申请表模板', required: true },
+        { name: 'requirements.txt', type: 'file-config', description: '依赖清单', analogy: '采购清单', required: true },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
+    ],
+    steps: [
+      {
+        title: '安装依赖',
+        time: '10分钟',
+        code: 'pip install requests python-dotenv',
+        explanation:
+          'requests 是 Python 最流行的 HTTP 库，python-dotenv 用于从 .env 文件加载环境变量。',
+        filename: 'requirements.txt',
+        filepath: 'ai-chat/',
+        lineRange: '第1行',
+        action: 'new-file' as const,
+        description: '安装 requests 和 python-dotenv',
+      },
+      {
+        title: '加载环境变量和配置',
+        time: '10分钟',
+        code: `import os\nimport requests\nfrom dotenv import load_dotenv\n\nload_dotenv()\n\nAPI_KEY = os.getenv("DEEPSEEK_API_KEY")\nAPI_URL = "https://api.deepseek.com/chat/completions"\nMODEL = "deepseek-chat"`,
+        explanation:
+          'load_dotenv() 自动读取 .env 文件中的环境变量。os.getenv() 获取 API Key。将 URL 和模型名定义为常量，方便后续修改。',
+        filename: 'chat.py',
+        filepath: 'ai-chat/',
+        lineRange: '第1-8行',
+        action: 'new-file' as const,
+        description: '导入模块，加载环境变量，定义 API 配置',
+      },
+      {
+        title: '实现 chat() 函数',
+        time: '30分钟',
+        code: `def chat(message: str) -> str:\n    headers = {\n        "Authorization": f"Bearer {API_KEY}",\n        "Content-Type": "application/json",\n    }\n    data = {\n        "model": MODEL,\n        "messages": [{"role": "user", "content": message}],\n        "temperature": 0.7,\n    }\n    try:\n        response = requests.post(API_URL, headers=headers, json=data, timeout=30)\n        response.raise_for_status()\n        result = response.json()\n        return result["choices"][0]["message"]["content"]\n    except requests.exceptions.HTTPError as e:\n        if response.status_code == 401:\n            return "❌ API Key 无效"\n        return f"❌ API 请求失败: {e}"\n    except requests.exceptions.Timeout:\n        return "❌ 请求超时"\n    except Exception as e:\n        return f"❌ 错误: {e}"`,
+        explanation:
+          '构造 headers（Authorization Bearer 认证），构造 data（model/messages/temperature），处理 401/超时/通用异常。raise_for_status() 检查 HTTP 错误码，非 2xx 会抛出异常。',
+        filename: 'chat.py',
+        filepath: 'ai-chat/',
+        lineRange: '第10-35行',
+        action: 'new-function' as const,
+        description: '实现 API 调用核心函数，处理各种异常情况',
+      },
+      {
+        title: '主循环',
+        time: '20分钟',
+        code: `def main():\n    if not API_KEY or API_KEY == "your_api_key_here":\n        print("⚠️ 请先设置 API Key！")\n        print("  1. 复制 .env.example 为 .env")\n        print("  2. 填入你的 DeepSeek API Key")\n        sys.exit(1)\n\n    print("🤖 AI 聊天助手  (输入 'quit' 退出)")\n    print("-" * 40)\n\n    while True:\n        user_input = input("\\n你: ").strip()\n        if not user_input:\n            continue\n        if user_input.lower() in ("quit", "exit", "q"):\n            print("\\n👋 再见！")\n            break\n        print("AI: ", end="", flush=True)\n        reply = chat(user_input)\n        print(reply)\n\nif __name__ == "__main__":\n    main()`,
+        explanation:
+          '检查 API Key 是否已设置，while True 接收输入，调用 chat()，打印回复，支持 quit 退出。',
+        filename: 'chat.py',
+        filepath: 'ai-chat/',
+        lineRange: '第37-60行',
+        action: 'modify' as const,
+        description: '整合所有功能，添加输入验证和循环菜单',
+      },
+    ],
+    keyConcepts: [
+      { name: 'API Key', description: '身份凭证，通过 Authorization 请求头传递。Never 硬编码到代码中，用环境变量管理。' },
+      { name: 'temperature', description: '控制随机性，0.7 适合对话，0.2 适合精确回答。值越高回答越创意，越低越确定。' },
+      { name: 'role', description: 'user（用户消息）、assistant（AI 回复）、system（设定人格的隐藏指令）。' },
+      { name: 'raise_for_status()', description: '检查 HTTP 错误码，非 2xx 会抛出异常，配合 try/except 实现优雅错误处理。' },
+    ],
+    faq: [
+      { q: "401 Unauthorized", a: 'API Key 无效或过期，检查 .env 文件中的 DEEPSEEK_API_KEY 是否正确。' },
+      { q: "请求超时", a: '网络问题或 API 繁忙，增加 timeout 值或稍后重试。' },
+      { q: "ModuleNotFoundError: No module named 'dotenv'", a: '未安装 python-dotenv，运行 pip install python-dotenv。' },
+    ],
+    githubProjects: [
+      { name: 'bradtraversy/ai-chatbot', stars: '~200', description: 'Node.js 版本但核心逻辑相同：调用 OpenAI API 进行对话' },
+      { name: 'himanshumoral/ai-assistant-cli', stars: '~15', description: 'Python CLI AI 助手，支持多模型切换' },
+    ],
+    extensions: [
+      { level: 1, text: '添加对话历史记录', skill: '列表+上下文拼接' },
+      { level: 2, text: '支持流式输出（SSE）', skill: '流式响应处理' },
+      { level: 2, text: '添加系统提示词定制', skill: 'system role' },
+      { level: 3, text: '用 Streamlit 做成 Web 界面', skill: 'Web UI 框架' }
+    ]
+  },
+  'chat-history': {
+    slug: 'chat-history',
+    emoji: '💬',
+    title: '带历史记忆的聊天机器人',
+    level: 2,
+    levelLabel: 'Level 2',
+    levelColor: 'from-[#C07BA0] to-[#9B5A7D]',
+    time: '2-3小时',
+    lines: '~270行',
+    stack: ['Python', 'requests', 'JSON文件'],
+    stackColor: 'bg-[#FDF3E8] text-[#B55A00]',
+    prerequisites: ['Python基础', '字典操作', '文件读写', 'JSON基础'],
+    description:
+      '多轮对话 + 多会话管理 + 系统提示词定制 + JSON 持久化。完整的对话系统入门。',
+    whyThisProject:
+      '从单轮对话升级到多轮对话，理解对话状态管理的核心概念。学习系统提示词（system prompt）如何塑造 AI 人格。掌握本地 JSON 持久化，数据不丢失。',
+    image: '/project-chat-history.jpg',
+    resumeText:
+      '开发带历史记忆的 AI 聊天机器人，支持多会话管理、系统提示词定制、JSON 本地持久化。实现对话状态维护、上下文窗口管理、多角色消息格式。',
+    resumeTags: ['对话状态管理', '数据持久化', '系统提示词'],
+    fileStructure: [
+      { name: 'chat-history', type: 'folder', description: '项目根文件夹', required: true, children: [
+        { name: 'chat.py', type: 'file-core', description: '核心逻辑：API调用、会话管理、交互界面', analogy: '就像餐厅的全套服务系统', required: true },
+        { name: '.env.example', type: 'file-config', description: '环境变量模板', required: true },
+        { name: 'requirements.txt', type: 'file-config', description: '依赖清单', required: true },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
+    ],
+    steps: [
+      {
+        title: '环境配置',
+        time: '10分钟',
+        code: 'pip install requests python-dotenv',
+        explanation:
+          '安装 requests 和 python-dotenv。复制 .env.example 为 .env 填入 Key。',
+        filename: 'requirements.txt',
+        filepath: 'chat-history/',
+        lineRange: '第1行',
+        action: 'new-file' as const,
+        description: '安装依赖，配置环境变量',
+      },
+      {
+        title: '数据持久化层',
+        time: '30分钟',
+        code: `import json\nimport os\nfrom datetime import datetime\n\nHISTORY_FILE = "chat_history.json"\n\ndef load_sessions() -> dict:\n    if not os.path.exists(HISTORY_FILE):\n        return {}\n    try:\n        with open(HISTORY_FILE, "r", encoding="utf-8") as f:\n            return json.load(f)\n    except:\n        return {}\n\ndef save_sessions(sessions: dict):\n    with open(HISTORY_FILE, "w", encoding="utf-8") as f:\n        json.dump(sessions, f, ensure_ascii=False, indent=2)\n\ndef create_session(sessions: dict, system_prompt: str = "") -> str:\n    sid = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"\n    sessions[sid] = {\n        "title": f"对话 {len(sessions) + 1}",\n        "created_at": datetime.now().isoformat(),\n        "system_prompt": system_prompt or "你是一个 helpful 的 AI 助手",\n        "messages": [],\n    }\n    save_sessions(sessions)\n    return sid`,
+        explanation:
+          'load_sessions() 读取 chat_history.json，save_sessions() 写入，create_session() 创建新对话。JSON 格式是人类可读的文本格式。',
+        filename: 'chat.py',
+        filepath: 'chat-history/',
+        lineRange: '第1-35行',
+        action: 'new-file' as const,
+        description: '实现数据持久化层：加载、保存、创建会话',
+      },
+      {
+        title: '对话管理',
+        time: '60分钟',
+        code: `def chat_with_history(messages: list, system_prompt: str) -> str:\n    headers = {\n        "Authorization": f"Bearer {API_KEY}",\n        "Content-Type": "application/json",\n    }\n    full_messages = [{"role": "system", "content": system_prompt}]\n    full_messages.extend(messages)\n    data = {\n        "model": MODEL,\n        "messages": full_messages,\n        "temperature": 0.7,\n    }\n    try:\n        response = requests.post(API_URL, headers=headers, json=data, timeout=30)\n        response.raise_for_status()\n        result = response.json()\n        return result["choices"][0]["message"]["content"]\n    except Exception as e:\n        return f"❌ 错误: {e}"\n\ndef chat_loop(session_id: str, sessions: dict):\n    session = sessions[session_id]\n    print(f"\\n💬 {session['title']}")\n    print(f"输入 /help 查看命令\\n")\n    while True:\n        user_input = input("你: ").strip()\n        if not user_input:\n            continue\n        if user_input.lower() in ("quit", "exit", "q"):\n            save_sessions(sessions)\n            return "quit"\n        if user_input == "/help":\n            show_help(); continue\n        if user_input == "/new":\n            save_sessions(sessions); return "new"\n        if user_input == "/list":\n            list_sessions(sessions); continue\n        if user_input.startswith("/switch "):\n            idx = int(user_input.split()[1]) - 1\n            keys = list(sessions.keys())\n            if 0 <= idx < len(keys):\n                save_sessions(sessions); return keys[idx]\n        if user_input.startswith("/system "):\n            session["system_prompt"] = user_input[8:].strip()\n            save_sessions(sessions)\n            print("✅ 系统提示词已更新"); continue\n        if user_input == "/personality":\n            session["system_prompt"] = choose_personality()\n            save_sessions(sessions)\n            print("✅ 人格已切换\\n"); continue\n        if user_input == "/clear":\n            session["messages"] = []\n            save_sessions(sessions)\n            print("🗑️ 当前对话已清空"); continue\n        session["messages"].append({"role": "user", "content": user_input})\n        print("AI: ", end="", flush=True)\n        reply = chat_with_history(session["messages"], session["system_prompt"])\n        print(reply)\n        session["messages"].append({"role": "assistant", "content": reply})\n        save_sessions(sessions)`,
+        explanation:
+          'chat_with_history() 构造 system + messages 列表发送 API。chat_loop() 处理 /new /list /switch /system /personality /clear /help 命令，以及正常对话。',
+        filename: 'chat.py',
+        filepath: 'chat-history/',
+        lineRange: '第37-120行',
+        action: 'new-function' as const,
+        description: '实现对话管理和命令处理',
+      },
+      {
+        title: '人格定制',
+        time: '20分钟',
+        code: `def choose_personality() -> str:\n    personalities = {\n        "1": ("通用助手", "你是一个 helpful 的 AI 助手，用中文回答问题"),\n        "2": ("代码导师", "你是一位耐心的编程导师，擅长用简单的语言解释复杂的编程概念"),\n        "3": ("创意写手", "你是一位富有创意的作家，擅长各种文体的写作"),\n        "4": ("极简回答", "你是一个极简主义者，回答简洁直接，不超过3句话"),\n        "5": ("详细解释", "你是一个耐心的老师，回答详细全面，先给结论再展开"),\n    }\n    print("🎭 选择 AI 人格:")\n    for k, (name, _) in personalities.items():\n        print(f"  [{k}] {name}")\n    print("  [6] 自定义")\n    choice = input("选择: ").strip()\n    if choice == "6":\n        return input("输入自定义系统提示词: ").strip()\n    return personalities.get(choice, personalities["1"])[1]`,
+        explanation:
+          '提供 5 种预设人格（通用/导师/写手/极简/详细），支持自定义。系统提示词通过 system role 传递给模型，塑造 AI 的回答风格。',
+        filename: 'chat.py',
+        filepath: 'chat-history/',
+        lineRange: '第122-140行',
+        action: 'new-function' as const,
+        description: '实现人格选择功能',
+      },
+    ],
+    keyConcepts: [
+      { name: 'system role', description: '设定 AI 人格和行为的隐藏指令，模型会在内部遵循但不直接展示给用户。' },
+      { name: '上下文窗口', description: '历史消息越多，token 消耗越多，超出限制会报错。需要定期清理或限制历史长度。' },
+      { name: '多会话', description: '用 dict 存储多个 session，每个 session 独立 messages，实现"多个聊天窗口"。' },
+      { name: '持久化', description: 'JSON 文件读写实现"记忆"，退出不丢失。ensure_ascii=False 保证中文正常保存。' },
+    ],
+    faq: [
+      { q: "上下文太长导致报错", a: '清理旧消息或限制历史长度。可只保留最近 N 轮对话。' },
+      { q: "切换对话后历史丢失", a: '检查是否正确调用了 save_sessions()。确保 HISTORY_FILE 有写入权限。' },
+      { q: "人格切换不生效", a: '确保 system_prompt 已更新并保存。system 只在对话开始时生效，新对话才会完全应用。' },
+    ],
+    githubProjects: [
+      { name: 'bradtraversy/ai-chatbot', stars: '~200', description: 'React 版本但核心逻辑相同：维护对话历史列表' },
+      { name: 'himanshumoral/chatgpt-cli', stars: '~30', description: 'Python CLI 多会话聊天工具，支持上下文管理' },
+    ],
+    extensions: [
+      { level: 1, text: '添加消息数量统计', skill: '计数器' },
+      { level: 2, text: '导出对话为 Markdown', skill: '文件格式化' },
+      { level: 2, text: '搜索历史对话内容', skill: '字符串搜索' },
+      { level: 3, text: 'Web 界面管理对话', skill: 'Flask/Streamlit' }
+    ]
+  },
+  'tool-agent': {
+    slug: 'tool-agent',
+    emoji: '🔧',
+    title: '多工具智能 Agent',
+    level: 3,
+    levelLabel: 'Level 3',
+    levelColor: 'from-[#4A90D9] to-[#2E5A8C]',
+    time: '3-5小时',
+    lines: '~300行',
+    stack: ['Python', 'requests', 'JSON'],
+    stackColor: 'bg-[#E3F0FC] text-[#2E5A8C]',
+    prerequisites: ['Python基础', '字典操作', '函数作为参数', '正则表达式基础'],
+    description:
+      '大模型自动判断调用哪个工具（天气/计算/搜索/时间），实现 Function Calling 入门。',
+    whyThisProject:
+      'Function Calling 是 Agent 的核心能力。让大模型"使用工具"是现代 AI 应用的基础。学习工具注册、意图路由、结果回传等核心概念。',
+    image: '/project-tool-agent.jpg',
+    resumeText:
+      '开发多工具智能 Agent，实现 Function Calling 能力。大模型根据用户问题自动判断调用天气查询、数学计算、时间获取等工具，执行后将结果回传给模型生成最终回答。',
+    resumeTags: ['Function Calling', '工具注册', '意图路由'],
+    fileStructure: [
+      { name: 'tool-agent', type: 'folder', description: '项目根文件夹', required: true, children: [
+        { name: 'agent.py', type: 'file-core', description: '核心逻辑：工具注册、意图路由、结果回传', analogy: '就像餐厅的智能调度系统', required: true },
+        { name: '.env.example', type: 'file-config', description: '环境变量模板', required: true },
+        { name: 'requirements.txt', type: 'file-config', description: '依赖清单', required: true },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false }
+      ]}
+    ],
+    steps: [
+      {
+        title: '环境配置',
+        time: '10分钟',
+        code: 'pip install requests python-dotenv',
+        explanation:
+          '安装 requests 和 python-dotenv。配置 .env 文件。',
+        filename: 'requirements.txt',
+        filepath: 'tool-agent/',
+        lineRange: '第1行',
+        action: 'new-file' as const,
+        description: '安装依赖，配置环境变量',
+      },
+      {
+        title: '工具定义',
+        time: '40分钟',
+        code: `def tool_get_weather(city: str) -> str:\n    try:\n        url = f"https://wttr.in/{city}?format=%C|%t|%h|%w"\n        r = requests.get(url, timeout=10)\n        if r.status_code == 200:\n            parts = r.text.strip().split("|")\n            return f"{city}天气: {parts[0]}, 温度{parts[1]}"\n        return f"无法获取 {city} 天气"\n    except Exception as e:\n        return f"天气查询失败: {e}"\n\ndef tool_calculate(expression: str) -> str:\n    try:\n        allowed = set("0123456789+-*/.() **%// ")\n        if not all(c in allowed for c in expression):\n            return "表达式包含非法字符"\n        result = eval(expression, {"__builtins__": {}}, {})\n        return f"{expression} = {result}"\n    except Exception as e:\n        return f"计算错误: {e}"\n\ndef tool_search_web(query: str) -> str:\n    return f"搜索结果: 关于'{query}'的相关信息可以在百科、知乎等平台找到。"\n\ndef tool_get_time() -> str:\n    from datetime import datetime\n    now = datetime.now()\n    return f"当前时间: {now.strftime('%Y年%m月%d日 %H:%M:%S')}"\n\nTOOLS = {\n    "get_weather": {\n        "function": tool_get_weather,\n        "description": "查询指定城市的当前天气状况",\n        "parameters": {"city": {"type": "string", "description": "城市名称，如北京、上海"}}\n    },\n    "calculate": {\n        "function": tool_calculate,\n        "description": "计算数学表达式，如 1+1、2**10",\n        "parameters": {"expression": {"type": "string", "description": "数学表达式字符串"}}\n    },\n    "search_web": {\n        "function": tool_search_web,\n        "description": "搜索互联网上的信息",\n        "parameters": {"query": {"type": "string", "description": "搜索关键词"}}\n    },\n    "get_time": {\n        "function": tool_get_time,\n        "description": "获取当前的日期和时间",\n        "parameters": {}\n    },\n}`,
+        explanation:
+          'TOOLS 字典注册 4 个工具（get_weather/calculate/search_web/get_time），每个工具包含 function/description/parameters。清晰的 description 帮助模型做出正确选择。',
+        filename: 'agent.py',
+        filepath: 'tool-agent/',
+        lineRange: '第1-50行',
+        action: 'new-file' as const,
+        description: '定义工具函数和工具注册表',
+      },
+      {
+        title: '工具调用解析',
+        time: '30分钟',
+        code: `def parse_tool_call(response_text: str) -> dict | None:\n    text = response_text.strip()\n    if text.startswith("{") and text.endswith("}"):\n        try:\n            data = json.loads(text)\n            if "tool" in data and data["tool"] in TOOLS:\n                return data\n        except json.JSONDecodeError:\n            pass\n    import re\n    pattern = r'(\\w+)\\s*\\(\\s*([^)]*)\\s*\\)'\n    match = re.match(pattern, text)\n    if match:\n        tool_name = match.group(1)\n        param_str = match.group(2)\n        if tool_name in TOOLS:\n            params = {}\n            if param_str:\n                for pair in param_str.split(","):\n                    pair = pair.strip()\n                    if "=" in pair:\n                        k, v = pair.split("=", 1)\n                        v = v.strip().strip('"').strip("'")\n                        params[k.strip()] = v\n            return {"tool": tool_name, "parameters": params}\n    return None\n\ndef execute_tool(tool_info: dict) -> str:\n    name = tool_info["tool"]\n    params = tool_info.get("parameters", {})\n    tool = TOOLS[name]\n    func = tool["function"]\n    try:\n        result = func(**params)\n        return result\n    except Exception as e:\n        return f"工具执行失败: {e}"`,
+        explanation:
+          'parse_tool_call() 解析模型返回的 JSON 格式工具调用，支持 JSON 和函数式两种格式。execute_tool() 执行工具并返回结果。',
+        filename: 'agent.py',
+        filepath: 'tool-agent/',
+        lineRange: '第52-90行',
+        action: 'new-function' as const,
+        description: '实现工具调用解析和执行',
+      },
+      {
+        title: 'Agent 主循环',
+        time: '40分钟',
+        code: `def build_tool_prompt() -> str:\n    lines = [\n        "你是一个智能助手。你可以使用以下工具来回答用户的问题。",\n        "如果需要使用工具，请严格按照以下 JSON 格式回复：",\n        '',\n        '{"tool": "工具名", "parameters": {"参数名": "参数值"}}',\n        '',\n        "可用工具：",\n    ]\n    for name, info in TOOLS.items():\n        lines.append(f"  - {name}: {info['description']}")\n        for pname, pdesc in info["parameters"].items():\n            lines.append(f"      参数 {pname}: {pdesc['description']}")\n    return "\\n".join(lines)\n\ndef chat(messages: list) -> str:\n    headers = {\n        "Authorization": f"Bearer {API_KEY}",\n        "Content-Type": "application/json",\n    }\n    data = {\n        "model": MODEL,\n        "messages": messages,\n        "temperature": 0.5,\n    }\n    try:\n        response = requests.post(API_URL, headers=headers, json=data, timeout=30)\n        response.raise_for_status()\n        result = response.json()\n        return result["choices"][0]["message"]["content"]\n    except Exception as e:\n        return f"❌ API 错误: {e}"\n\ndef agent_run(user_input: str) -> str:\n    system_prompt = build_tool_prompt()\n    messages = [\n        {"role": "system", "content": system_prompt},\n        {"role": "user", "content": user_input},\n    ]\n    print("[思考] 分析用户需求...")\n    first_response = chat(messages)\n    tool_info = parse_tool_call(first_response)\n    if tool_info is None:\n        return first_response\n    tool_name = tool_info["tool"]\n    print(f"[决策] 调用工具: {tool_name}")\n    tool_result = execute_tool(tool_info)\n    print(f"[结果] {tool_result}")\n    messages.append({"role": "assistant", "content": first_response})\n    messages.append({\n        "role": "user",\n        "content": f"工具 '{tool_name}' 的返回结果: {tool_result}\\n\\n请根据这个结果回答用户的原始问题。"\n    })\n    final_response = chat(messages)\n    return final_response`,
+        explanation:
+          'agent_run() 第一次调用让模型判断是否需要工具，如果需要则 execute_tool() 执行并回传结果，第二次调用生成最终回答。temperature=0.5 让模型更确定性。',
+        filename: 'agent.py',
+        filepath: 'tool-agent/',
+        lineRange: '第92-150行',
+        action: 'new-function' as const,
+        description: '实现 Agent 主循环：意图判断、工具执行、结果回传',
+      },
+    ],
+    keyConcepts: [
+      { name: 'Tool Calling', description: '让大模型"使用工具"是 Agent 的核心能力。模型根据工具描述自动判断是否需要调用。' },
+      { name: '意图路由', description: '模型自动判断用户需要什么工具，无需人工编写 if-else 规则。' },
+      { name: '工具描述', description: '清晰的 description 帮助模型做出正确选择。描述要说明工具用途和参数含义。' },
+      { name: '结果回传', description: '工具结果需再次传给模型，让其组织语言生成自然回答，而不是直接返回原始数据。' },
+    ],
+    faq: [
+      { q: "模型不返回工具调用", a: '检查工具描述是否清晰，temperature 是否太高。尝试降低 temperature 到 0.3-0.5。' },
+      { q: "工具参数解析失败", a: '检查 parse_tool_call 的 JSON 解析逻辑。确保模型返回的格式与预期一致。' },
+      { q: "eval 不安全", a: 'calculate 工具使用 eval，生产环境应改用 ast.literal_eval 或专门的数学表达式解析库。' },
+    ],
+    githubProjects: [
+      { name: 'langchain-ai/langchain', stars: '~90k', description: '最流行的 AI 应用框架，内置丰富的工具集成示例' },
+      { name: 'simonw/llm', stars: '~5k', description: '命令行工具调用大模型，支持插件和模板' },
+    ],
+    extensions: [
+      { level: 1, text: '添加文件读取工具', skill: '文件 IO' },
+      { level: 2, text: '接入真实搜索 API（SerpAPI）', skill: '第三方 API' },
+      { level: 2, text: '支持多工具链式调用', skill: '调用链' },
+      { level: 3, text: '添加记忆模块（向量数据库）', skill: 'RAG 基础' }
+    ]
+  },
+  'rag-kb': {
+    slug: 'rag-kb',
+    emoji: '📚',
+    title: 'RAG 知识库问答系统',
+    level: 3,
+    levelLabel: 'Level 3',
+    levelColor: 'from-[#4A90D9] to-[#2E5A8C]',
+    time: '5-7小时',
+    lines: '~400行',
+    stack: ['Python', 'requests', 'ChromaDB', 'SiliconFlow'],
+    stackColor: 'bg-[#E3F0FC] text-[#2E5A8C]',
+    prerequisites: ['Python基础', '列表/字典操作', '文件读写', 'API调用基础'],
+    description:
+      '文档上传 → 切分向量化 → 向量检索 → 大模型生成回答。RAG 完整流程实战。',
+    whyThisProject:
+      'RAG（检索增强生成）是 AI 应用落地的核心技术。学会 RAG，你就能构建企业知识库、智能客服、文档问答等真实产品。本项目覆盖 Embedding、向量数据库、检索、增强生成完整链路。',
+    image: '/project-rag-kb.jpg',
+    resumeText:
+      '开发 RAG 知识库问答系统，实现文档上传、文本切分、Embedding 向量化、ChromaDB 向量检索、检索增强生成完整流程。支持批量上传、多文档管理、问答交互。',
+    resumeTags: ['Embedding', '向量检索', '检索增强生成', 'ChromaDB'],
+    fileStructure: [
+      { name: 'rag-kb', type: 'folder', description: '项目根文件夹', required: true, children: [
+        { name: 'rag.py', type: 'file-core', description: '核心逻辑：向量库、文档处理、RAG问答', analogy: '就像图书馆的智能查询系统', required: true },
+        { name: '.env.example', type: 'file-config', description: '环境变量模板（需要两个API Key）', required: true },
+        { name: 'requirements.txt', type: 'file-config', description: '依赖清单', required: true },
+        { name: 'README.md', type: 'file-doc', description: '项目说明文档', required: false },
+        { name: 'sample_docs/', type: 'folder', description: '测试文档文件夹', required: false }
+      ]}
+    ],
+    steps: [
+      {
+        title: '环境配置',
+        time: '15分钟',
+        code: 'pip install requests python-dotenv chromadb',
+        explanation:
+          '安装 requests、python-dotenv 和 chromadb。配置 .env（需要 DEEPSEEK_API_KEY 和 SILICONFLOW_API_KEY）。',
+        filename: 'requirements.txt',
+        filepath: 'rag-kb/',
+        lineRange: '第1行',
+        action: 'new-file' as const,
+        description: '安装依赖，配置两个 API Key',
+      },
+      {
+        title: '向量数据库',
+        time: '30分钟',
+        code: `class VectorStore:\n    def __init__(self, persist_dir: str = "chroma_db"):\n        try:\n            import chromadb\n            self.client = chromadb.PersistentClient(path=persist_dir)\n            self.collection = self.client.get_or_create_collection("documents")\n            self.available = True\n        except ImportError:\n            print("⚠️ 未安装 chromadb，运行: pip install chromadb")\n            self.available = False\n\n    def add_documents(self, texts, ids, metadatas, embeddings):\n        if not self.available:\n            return\n        self.collection.add(\n            embeddings=embeddings, ids=ids, metadatas=metadatas, documents=texts\n        )\n\n    def search(self, query_embedding, top_k=3):\n        if not self.available:\n            return {"documents": [[]], "metadatas": [[]], "distances": [[]]}\n        return self.collection.query(\n            query_embeddings=[query_embedding], n_results=top_k\n        )\n\n    def count(self):\n        if not self.available:\n            return 0\n        return self.collection.count()\n\n    def clear(self):\n        if not self.available:\n            return\n        docs = self.collection.get()\n        if docs and docs["ids"]:\n            self.collection.delete(ids=docs["ids"])`,
+        explanation:
+          'VectorStore 类封装 ChromaDB，支持 add_documents/search/count/clear。PersistentClient 将数据持久化到磁盘。',
+        filename: 'rag.py',
+        filepath: 'rag-kb/',
+        lineRange: '第1-40行',
+        action: 'new-file' as const,
+        description: '封装 ChromaDB 向量数据库操作',
+      },
+      {
+        title: '文档处理',
+        time: '45分钟',
+        code: `def split_text(text: str, chunk_size=500, overlap=50) -> list[str]:\n    chunks = []\n    start = 0\n    while start < len(text):\n        end = min(start + chunk_size, len(text))\n        if end < len(text):\n            for sep in ["\\n\\n", "。", "\\n", " "]:\n                idx = text.rfind(sep, start + chunk_size // 2, end)\n                if idx != -1:\n                    end = idx + len(sep)\n                    break\n        chunks.append(text[start:end].strip())\n        if end >= len(text):\n            break\n        start = end - overlap\n    return [c for c in chunks if c]\n\ndef load_document(filepath: str) -> str:\n    try:\n        with open(filepath, "r", encoding="utf-8") as f:\n            return f.read()\n    except UnicodeDecodeError:\n        try:\n            with open(filepath, "r", encoding="gbk") as f:\n                return f.read()\n        except:\n            return ""\n    except Exception as e:\n        print(f"读取文件失败 {filepath}: {e}")\n        return ""\n\ndef process_and_store(store, filepath: str) -> int:\n    filename = os.path.basename(filepath)\n    print(f"  📄 处理: {filename}")\n    text = load_document(filepath)\n    if not text:\n        print(f"  文件为空或无法读取，跳过")\n        return 0\n    chunks = split_text(text, chunk_size=500, overlap=50)\n    if not chunks:\n        print(f"  切分后为空，跳过")\n        return 0\n    print(f"  切分为 {len(chunks)} 个片段")\n    ids = [f"{filename}_{i}" for i in range(len(chunks))]\n    metadatas = [{"source": filename, "chunk_index": i} for i in range(len(chunks))]\n    print(f"  正在获取 Embeddings...")\n    embeddings = get_embeddings(chunks)\n    if not embeddings or len(embeddings) != len(chunks):\n        print(f"  Embedding 获取失败，跳过")\n        return 0\n    store.add_documents(texts=chunks, ids=ids, metadatas=metadatas, embeddings=embeddings)\n    print(f"  ✅ {filename} 已存入向量库 ({len(chunks)} 片段)")\n    return len(chunks)`,
+        explanation:
+          'split_text() 切分文本（500字符/块，50字符重叠），load_document() 加载文件，process_and_store() 加载→切分→Embedding→存储。',
+        filename: 'rag.py',
+        filepath: 'rag-kb/',
+        lineRange: '第42-100行',
+        action: 'new-function' as const,
+        description: '实现文档加载、文本切分、Embedding、存储',
+      },
+      {
+        title: 'RAG 问答',
+        time: '45分钟',
+        code: `def rag_answer(store, question: str) -> str:\n    print(f"  [RAG] 问题向量化...")\n    query_embs = get_embeddings([question])\n    if not query_embs:\n        return "❌ 问题向量化失败"\n    query_emb = query_embs[0]\n    print(f"  [RAG] 检索相关文档...")\n    results = store.search(query_emb, top_k=3)\n    docs = results["documents"][0] if results["documents"] else []\n    metas = results["metadatas"][0] if results["metadatas"] else []\n    if not docs:\n        return "未找到相关文档，请先上传文档。"\n    context_parts = []\n    for i, (doc, meta) in enumerate(zip(docs, metas), 1):\n        source = meta.get("source", "未知")\n        context_parts.append(f"[文档{i}] 来自 {source}:\\n{doc}\\n")\n    context = "\\n".join(context_parts)\n    print(f"  [RAG] 检索到 {len(docs)} 个相关片段")\n    prompt = f"""根据以下参考文档回答问题。如果文档中没有相关信息，请如实说明。\n\n参考文档:\n{context}\n\n用户问题: {question}\n\n请用中文回答:"""\n    headers = {\n        "Authorization": f"Bearer {CHAT_API_KEY}",\n        "Content-Type": "application/json",\n    }\n    data = {\n        "model": CHAT_MODEL,\n        "messages": [{"role": "user", "content": prompt}],\n        "temperature": 0.3,\n    }\n    try:\n        response = requests.post(CHAT_URL, headers=headers, json=data, timeout=30)\n        response.raise_for_status()\n        result = response.json()\n        return result["choices"][0]["message"]["content"]\n    except Exception as e:\n        return f"❌ API 错误: {e}"`,
+        explanation:
+          'rag_answer() 问题向量化→向量检索(top-3)→构建上下文 Prompt→大模型生成回答。temperature=0.3 让回答更基于文档内容。',
+        filename: 'rag.py',
+        filepath: 'rag-kb/',
+        lineRange: '第102-150行',
+        action: 'new-function' as const,
+        description: '实现 RAG 问答完整流程',
+      },
+    ],
+    keyConcepts: [
+      { name: 'Embedding', description: '将文本映射为高维向量，语义相似的文本向量距离近。是 RAG 的核心技术。' },
+      { name: '向量检索', description: '用余弦相似度找到与问题最相关的文档片段。top_k 控制返回数量。' },
+      { name: 'Chunk 切分', description: '长文档必须切分，块大小和重叠率影响检索质量。500字符/50重叠是常用参数。' },
+      { name: 'RAG', description: '检索 + 生成，让大模型基于私有文档回答，避免幻觉。是 AI 应用落地的核心技术。' },
+    ],
+    faq: [
+      { q: "Embedding 报错 404", a: 'DeepSeek 不提供 Embedding API，项目使用 SiliconFlow 免费 Embedding 服务。' },
+      { q: "ChromaDB 下载模型超时", a: '代码已传入 embeddings，ChromaDB 不需要下载模型。检查网络连接。' },
+      { q: "上传文档后问答不相关", a: '调整 chunk_size 和 overlap，或增加 top_k 检索数量。确保文档内容与问题相关。' },
+    ],
+    githubProjects: [
+      { name: 'langchain-ai/langchain', stars: '~90k', description: '最流行的 RAG 框架，内置向量存储和检索链' },
+      { name: 'chroma-core/chroma', stars: '~15k', description: 'ChromaDB 官方仓库，了解向量数据库底层实现' },
+    ],
+    extensions: [
+      { level: 1, text: '支持 PDF 文件上传', skill: 'pdfplumber' },
+      { level: 2, text: '添加重排序（Rerank）提升精度', skill: '语义排序' },
+      { level: 2, text: '接入网络搜索实现混合 RAG', skill: '搜索+知识库' },
+      { level: 3, text: '用 Gradio 做成 Web 界面', skill: 'Web UI' }
+    ]
+  },
 }
 
 /* ──────────────────── helpers ──────────────────── */
